@@ -1,4 +1,4 @@
-/*
+ /*
  * 
  */
 
@@ -7,7 +7,8 @@
 
 IRsend irsend;
   int khz = 15; // 38kHz carrier frequency for the NEC protocol
-  unsigned int rawData[33] = {20, 25, 45, 25, 85, 25, 20, 25, 45, 20, 90, 25, 45, 45, 25, 45, 25, 45, 25, 65, 45, 95, 95, 25, 20, 25, 20, 55, 45, 45, 45, 20, 20};
+ //6491857 unsigned int rawData[33] = {22, 22, 48, 22, 88, 22, 22, 22, 48, 22, 88, 22, 48, 48, 22, 48, 22, 48, 22, 68, 48, 93, 93, 22, 22, 22, 22, 53, 48, 48, 48, 22, 22};
+ unsigned int rawData[35] = {22, 48, 22, 22, 93, 22, 48, 68, 48, 68, 22, 48, 22, 22, 68, 48, 22, 68, 22, 22, 22, 93, 22, 93, 22, 22, 22, 48, 22, 22, 22, 22, 48, 22, 22};
 
 void setup()
 {
@@ -16,6 +17,7 @@ void setup()
 }
 
 void loop() {
-  irsend.sendRaw(rawData, 33, khz); //Note the approach used to automatically calculate the size of the array.
-  delayMicroseconds(500);
+  //6491857 irsend.sendRaw(rawData, 33, khz); //Note the approach used to automatically calculate the size of the array.
+  irsend.sendRaw(rawData, 35, khz); //Note the approach used to automatically calculate the size of the array.
+  delayMicroseconds(480);
 }
