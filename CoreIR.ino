@@ -1,8 +1,3 @@
-//****CONFIGURATION OPTIONS****
-//change transponder ID # by setting a different transponder number
-//available values are 1-6
-
-//****CONFIGURATION END****
 /*
 *
 * I-lap "transponder" compatible IR transmitter for RC timing system
