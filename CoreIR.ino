@@ -24,8 +24,9 @@
 // Enable debug info on serial output
 // #define debug
 
-// Set up IR transmitter signal
-#include <IRremote.h>
+#include "IRrem.h"
+#include "IRsnd.h"
+
 IRsend irsend;
 
 // Set up status LED

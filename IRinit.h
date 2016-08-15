@@ -14,27 +14,27 @@
 // Whynter A/C ARC-110WD added by Francesco Meschia
 //******************************************************************************
 
-#ifndef IRremoteint_h
-#define IRremoteint_h
+#ifndef IRinit_h
+#define IRinit_h
 
 //------------------------------------------------------------------------------
 // Include the right Arduino header
 //
 #if defined(ARDUINO) && (ARDUINO >= 100)
-#	include <Arduino.h>
+#  include <Arduino.h>
 #else
-#	if !defined(IRPRONTO)
-#		include <WProgram.h>
-#	endif
+# if !defined(IRPRONTO)
+#   include <WProgram.h>
+# endif
 #endif
 
 //------------------------------------------------------------------------------
 // This handles definition and access to global variables
 //
 #ifdef IR_GLOBAL
-#	define EXTERN
+# define EXTERN
 #else
-#	define EXTERN extern
+# define EXTERN extern
 #endif
 
 //------------------------------------------------------------------------------
@@ -43,17 +43,17 @@
 #define RAWBUF  101  // Maximum length of raw duration buffer
 
 typedef
-	struct {
-		// The fields are ordered to reduce memory over caused by struct-padding
-		uint8_t       rcvstate;        // State Machine state
-		uint8_t       recvpin;         // Pin connected to IR data from detector
-		uint8_t       blinkpin;
-		uint8_t       blinkflag;       // true -> enable blinking of pin on IR processing
-		uint8_t       rawlen;          // counter of entries in rawbuf
-		unsigned int  timer;           // State timer, counts 50uS ticks.
-		unsigned int  rawbuf[RAWBUF];  // raw data
-		uint8_t       overflow;        // Raw buffer overflow occurred
-	}
+  struct {
+    // The fields are ordered to reduce memory over caused by struct-padding
+    uint8_t       rcvstate;        // State Machine state
+    uint8_t       recvpin;         // Pin connected to IR data from detector
+    uint8_t       blinkpin;
+    uint8_t       blinkflag;       // true -> enable blinking of pin on IR processing
+    uint8_t       rawlen;          // counter of entries in rawbuf
+    unsigned int  timer;           // State timer, counts 50uS ticks.
+    unsigned int  rawbuf[RAWBUF];  // raw data
+    uint8_t       overflow;        // Raw buffer overflow occurred
+  }
 irparams_t;
 
 // ISR State-Machine : Receiver States
@@ -73,44 +73,44 @@ EXTERN  volatile irparams_t  irparams;
 //
 
 #if defined(CORE_LED0_PIN)
-#	define BLINKLED        CORE_LED0_PIN
-#	define BLINKLED_ON()   (digitalWrite(CORE_LED0_PIN, HIGH))
-#	define BLINKLED_OFF()  (digitalWrite(CORE_LED0_PIN, LOW))
+# define BLINKLED        CORE_LED0_PIN
+# define BLINKLED_ON()   (digitalWrite(CORE_LED0_PIN, HIGH))
+# define BLINKLED_OFF()  (digitalWrite(CORE_LED0_PIN, LOW))
 
 #elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-#	define BLINKLED        13
-#	define BLINKLED_ON()   (PORTB |= B10000000)
-#	define BLINKLED_OFF()  (PORTB &= B01111111)
+# define BLINKLED        13
+# define BLINKLED_ON()   (PORTB |= B10000000)
+# define BLINKLED_OFF()  (PORTB &= B01111111)
 
 #elif defined(__AVR_ATmega644P__) || defined(__AVR_ATmega644__)
-#	define BLINKLED        0
-#	define BLINKLED_ON()   (PORTD |= B00000001)
-#	define BLINKLED_OFF()  (PORTD &= B11111110)
+# define BLINKLED        0
+# define BLINKLED_ON()   (PORTD |= B00000001)
+# define BLINKLED_OFF()  (PORTD &= B11111110)
 
 #else
-#	define BLINKLED        13
-	#define BLINKLED_ON()  (PORTB |= B00100000)
-#	define BLINKLED_OFF()  (PORTB &= B11011111)
+# define BLINKLED        13
+  #define BLINKLED_ON()  (PORTB |= B00100000)
+# define BLINKLED_OFF()  (PORTB &= B11011111)
 #endif
 
 //------------------------------------------------------------------------------
 // CPU Frequency
 //
 #ifdef F_CPU
-#	define SYSCLOCK  F_CPU     // main Arduino clock
+# define SYSCLOCK  F_CPU     // main Arduino clock
 #else
-#	define SYSCLOCK  16000000  // main Arduino clock
+# define SYSCLOCK  16000000  // main Arduino clock
 #endif
 
 //------------------------------------------------------------------------------
 // Defines for setting and clearing register bits
 //
 #ifndef cbi
-#	define cbi(sfr, bit)  (_SFR_BYTE(sfr) &= ~_BV(bit))
+# define cbi(sfr, bit)  (_SFR_BYTE(sfr) &= ~_BV(bit))
 #endif
 
 #ifndef sbi
-#	define sbi(sfr, bit)  (_SFR_BYTE(sfr) |= _BV(bit))
+# define sbi(sfr, bit)  (_SFR_BYTE(sfr) |= _BV(bit))
 #endif
 
 //------------------------------------------------------------------------------
@@ -154,25 +154,25 @@ EXTERN  volatile irparams_t  irparams;
 
 // Arduino Mega
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-	//#define IR_USE_TIMER1   // tx = pin 11
-	#define IR_USE_TIMER2     // tx = pin 9
-	//#define IR_USE_TIMER3   // tx = pin 5
-	//#define IR_USE_TIMER4   // tx = pin 6
-	//#define IR_USE_TIMER5   // tx = pin 46
+  //#define IR_USE_TIMER1   // tx = pin 11
+  #define IR_USE_TIMER2     // tx = pin 9
+  //#define IR_USE_TIMER3   // tx = pin 5
+  //#define IR_USE_TIMER4   // tx = pin 6
+  //#define IR_USE_TIMER5   // tx = pin 46
 
 // Teensy 1.0
 #elif defined(__AVR_AT90USB162__)
-	#define IR_USE_TIMER1     // tx = pin 17
+  #define IR_USE_TIMER1     // tx = pin 17
 
 // Teensy 2.0
 #elif defined(__AVR_ATmega32U4__)
-	//#define IR_USE_TIMER1   // tx = pin 14
-	//#define IR_USE_TIMER3   // tx = pin 9
-	#define IR_USE_TIMER4_HS  // tx = pin 10
+  //#define IR_USE_TIMER1   // tx = pin 14
+  //#define IR_USE_TIMER3   // tx = pin 9
+  #define IR_USE_TIMER4_HS  // tx = pin 10
 
 // Teensy 3.0 / Teensy 3.1
 #elif defined(__MK20DX128__) || defined(__MK20DX256__)
-	#define IR_USE_TIMER_CMT  // tx = pin 5
+  #define IR_USE_TIMER_CMT  // tx = pin 5
 
 // Teensy-LC
 #elif defined(__MKL26Z64__)
@@ -180,18 +180,18 @@ EXTERN  volatile irparams_t  irparams;
 
 // Teensy++ 1.0 & 2.0
 #elif defined(__AVR_AT90USB646__) || defined(__AVR_AT90USB1286__)
-	//#define IR_USE_TIMER1   // tx = pin 25
-	#define IR_USE_TIMER2     // tx = pin 1
-	//#define IR_USE_TIMER3   // tx = pin 16
+  //#define IR_USE_TIMER1   // tx = pin 25
+  #define IR_USE_TIMER2     // tx = pin 1
+  //#define IR_USE_TIMER3   // tx = pin 16
 
 // Sanguino
 #elif defined(__AVR_ATmega644P__) || defined(__AVR_ATmega644__)
-	//#define IR_USE_TIMER1   // tx = pin 13
-	#define IR_USE_TIMER2     // tx = pin 14
+  //#define IR_USE_TIMER1   // tx = pin 13
+  #define IR_USE_TIMER2     // tx = pin 14
 
 // Atmega8
 #elif defined(__AVR_ATmega8P__) || defined(__AVR_ATmega8__)
-	#define IR_USE_TIMER1     // tx = pin 9
+  #define IR_USE_TIMER1     // tx = pin 9
 
 // ATtiny84
 #elif defined(__AVR_ATtiny84__)
@@ -203,8 +203,8 @@ EXTERN  volatile irparams_t  irparams;
 
 // Arduino Duemilanove, Diecimila, LilyPad, Mini, Fio, Nano, etc
 #else
-	//#define IR_USE_TIMER1   // tx = pin 9
-	#define IR_USE_TIMER2     // tx = pin 3
+  //#define IR_USE_TIMER1   // tx = pin 9
+  #define IR_USE_TIMER2     // tx = pin 3
 
 #endif
 
@@ -224,41 +224,41 @@ EXTERN  volatile irparams_t  irparams;
 #define TIMER_INTR_NAME     TIMER2_COMPA_vect
 
 #define TIMER_CONFIG_KHZ(val) ({ \
-	const uint8_t pwmval = SYSCLOCK / 2000 / (val); \
-	TCCR2A               = _BV(WGM20); \
-	TCCR2B               = _BV(WGM22) | _BV(CS20); \
-	OCR2A                = pwmval; \
-	OCR2B                = pwmval / 3; \
+  const uint8_t pwmval = SYSCLOCK / 2000 / (val); \
+  TCCR2A               = _BV(WGM20); \
+  TCCR2B               = _BV(WGM22) | _BV(CS20); \
+  OCR2A                = pwmval; \
+  OCR2B                = pwmval / 3; \
 })
 
 #define TIMER_COUNT_TOP  (SYSCLOCK * USECPERTICK / 1000000)
 
 //-----------------
 #if (TIMER_COUNT_TOP < 256)
-#	define TIMER_CONFIG_NORMAL() ({ \
-		TCCR2A = _BV(WGM21); \
-		TCCR2B = _BV(CS20); \
-		OCR2A  = TIMER_COUNT_TOP; \
-		TCNT2  = 0; \
-	})
+# define TIMER_CONFIG_NORMAL() ({ \
+    TCCR2A = _BV(WGM21); \
+    TCCR2B = _BV(CS20); \
+    OCR2A  = TIMER_COUNT_TOP; \
+    TCNT2  = 0; \
+  })
 #else
-#	define TIMER_CONFIG_NORMAL() ({ \
-		TCCR2A = _BV(WGM21); \
-		TCCR2B = _BV(CS21); \
-		OCR2A  = TIMER_COUNT_TOP / 8; \
-		TCNT2  = 0; \
-	})
+# define TIMER_CONFIG_NORMAL() ({ \
+    TCCR2A = _BV(WGM21); \
+    TCCR2B = _BV(CS21); \
+    OCR2A  = TIMER_COUNT_TOP / 8; \
+    TCNT2  = 0; \
+  })
 #endif
 
 //-----------------
 #if defined(CORE_OC2B_PIN)
-#	define TIMER_PWM_PIN  CORE_OC2B_PIN  // Teensy
+# define TIMER_PWM_PIN  CORE_OC2B_PIN  // Teensy
 #elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-#	define TIMER_PWM_PIN  9              // Arduino Mega
+# define TIMER_PWM_PIN  9              // Arduino Mega
 #elif defined(__AVR_ATmega644P__) || defined(__AVR_ATmega644__)
-#	define TIMER_PWM_PIN  14             // Sanguino
+# define TIMER_PWM_PIN  14             // Sanguino
 #else
-#	define TIMER_PWM_PIN  3              // Arduino Duemilanove, Diecimila, LilyPad, etc
+# define TIMER_PWM_PIN  3              // Arduino Duemilanove, Diecimila, LilyPad, etc
 #endif
 
 //---------------------------------------------------------
@@ -272,42 +272,42 @@ EXTERN  volatile irparams_t  irparams;
 
 //-----------------
 #if defined(__AVR_ATmega8P__) || defined(__AVR_ATmega8__)
-#	define TIMER_ENABLE_INTR   (TIMSK |= _BV(OCIE1A))
-#	define TIMER_DISABLE_INTR  (TIMSK &= ~_BV(OCIE1A))
+# define TIMER_ENABLE_INTR   (TIMSK |= _BV(OCIE1A))
+# define TIMER_DISABLE_INTR  (TIMSK &= ~_BV(OCIE1A))
 #else
-#	define TIMER_ENABLE_INTR   (TIMSK1 = _BV(OCIE1A))
-#	define TIMER_DISABLE_INTR  (TIMSK1 = 0)
+# define TIMER_ENABLE_INTR   (TIMSK1 = _BV(OCIE1A))
+# define TIMER_DISABLE_INTR  (TIMSK1 = 0)
 #endif
 
 //-----------------
 #define TIMER_INTR_NAME       TIMER1_COMPA_vect
 
 #define TIMER_CONFIG_KHZ(val) ({ \
-	const uint16_t pwmval = SYSCLOCK / 2000 / (val); \
-	TCCR1A                = _BV(WGM11); \
-	TCCR1B                = _BV(WGM13) | _BV(CS10); \
-	ICR1                  = pwmval; \
-	OCR1A                 = pwmval / 3; \
+  const uint16_t pwmval = SYSCLOCK / 2000 / (val); \
+  TCCR1A                = _BV(WGM11); \
+  TCCR1B                = _BV(WGM13) | _BV(CS10); \
+  ICR1                  = pwmval; \
+  OCR1A                 = pwmval / 3; \
 })
 
 #define TIMER_CONFIG_NORMAL() ({ \
-	TCCR1A = 0; \
-	TCCR1B = _BV(WGM12) | _BV(CS10); \
-	OCR1A  = SYSCLOCK * USECPERTICK / 1000000; \
-	TCNT1  = 0; \
+  TCCR1A = 0; \
+  TCCR1B = _BV(WGM12) | _BV(CS10); \
+  OCR1A  = SYSCLOCK * USECPERTICK / 1000000; \
+  TCNT1  = 0; \
 })
 
 //-----------------
 #if defined(CORE_OC1A_PIN)
-#	define TIMER_PWM_PIN  CORE_OC1A_PIN  // Teensy
+# define TIMER_PWM_PIN  CORE_OC1A_PIN  // Teensy
 #elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-#	define TIMER_PWM_PIN  11             // Arduino Mega
+# define TIMER_PWM_PIN  11             // Arduino Mega
 #elif defined(__AVR_ATmega644P__) || defined(__AVR_ATmega644__)
-#	define TIMER_PWM_PIN  13             // Sanguino
+# define TIMER_PWM_PIN  13             // Sanguino
 #elif defined(__AVR_ATtiny84__)
 # define TIMER_PWM_PIN  6
 #else
-#	define TIMER_PWM_PIN  9              // Arduino Duemilanove, Diecimila, LilyPad, etc
+# define TIMER_PWM_PIN  9              // Arduino Duemilanove, Diecimila, LilyPad, etc
 #endif
 
 //---------------------------------------------------------
@@ -339,11 +339,11 @@ EXTERN  volatile irparams_t  irparams;
 
 //-----------------
 #if defined(CORE_OC3A_PIN)
-#	define TIMER_PWM_PIN  CORE_OC3A_PIN  // Teensy
+# define TIMER_PWM_PIN  CORE_OC3A_PIN  // Teensy
 #elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-#	define TIMER_PWM_PIN  5              // Arduino Mega
+# define TIMER_PWM_PIN  5              // Arduino Mega
 #else
-#	error "Please add OC3A pin number here\n"
+# error "Please add OC3A pin number here\n"
 #endif
 
 //---------------------------------------------------------
@@ -359,37 +359,37 @@ EXTERN  volatile irparams_t  irparams;
 #define TIMER_INTR_NAME     TIMER4_OVF_vect
 
 #define TIMER_CONFIG_KHZ(val) ({ \
-	const uint16_t pwmval = SYSCLOCK / 2000 / (val); \
-	TCCR4A                = (1<<PWM4A); \
-	TCCR4B                = _BV(CS40); \
-	TCCR4C                = 0; \
-	TCCR4D                = (1<<WGM40); \
-	TCCR4E                = 0; \
-	TC4H                  = pwmval >> 8; \
-	OCR4C                 = pwmval; \
-	TC4H                  = (pwmval / 3) >> 8; \
-	OCR4A                 = (pwmval / 3) & 255; \
+  const uint16_t pwmval = SYSCLOCK / 2000 / (val); \
+  TCCR4A                = (1<<PWM4A); \
+  TCCR4B                = _BV(CS40); \
+  TCCR4C                = 0; \
+  TCCR4D                = (1<<WGM40); \
+  TCCR4E                = 0; \
+  TC4H                  = pwmval >> 8; \
+  OCR4C                 = pwmval; \
+  TC4H                  = (pwmval / 3) >> 8; \
+  OCR4A                 = (pwmval / 3) & 255; \
 })
 
 #define TIMER_CONFIG_NORMAL() ({ \
-	TCCR4A = 0; \
-	TCCR4B = _BV(CS40); \
-	TCCR4C = 0; \
-	TCCR4D = 0; \
-	TCCR4E = 0; \
-	TC4H   = (SYSCLOCK * USECPERTICK / 1000000) >> 8; \
-	OCR4C  = (SYSCLOCK * USECPERTICK / 1000000) & 255; \
-	TC4H   = 0; \
-	TCNT4  = 0; \
+  TCCR4A = 0; \
+  TCCR4B = _BV(CS40); \
+  TCCR4C = 0; \
+  TCCR4D = 0; \
+  TCCR4E = 0; \
+  TC4H   = (SYSCLOCK * USECPERTICK / 1000000) >> 8; \
+  OCR4C  = (SYSCLOCK * USECPERTICK / 1000000) & 255; \
+  TC4H   = 0; \
+  TCNT4  = 0; \
 })
 
 //-----------------
 #if defined(CORE_OC4A_PIN)
-#	define TIMER_PWM_PIN  CORE_OC4A_PIN  // Teensy
+# define TIMER_PWM_PIN  CORE_OC4A_PIN  // Teensy
 #elif defined(__AVR_ATmega32U4__)
-#	define TIMER_PWM_PIN  13             // Leonardo
+# define TIMER_PWM_PIN  13             // Leonardo
 #else
-#	error "Please add OC4A pin number here\n"
+# error "Please add OC4A pin number here\n"
 #endif
 
 //---------------------------------------------------------
@@ -421,11 +421,11 @@ EXTERN  volatile irparams_t  irparams;
 
 //-----------------
 #if defined(CORE_OC4A_PIN)
-#	define TIMER_PWM_PIN  CORE_OC4A_PIN
+# define TIMER_PWM_PIN  CORE_OC4A_PIN
 #elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-#	define TIMER_PWM_PIN  6  // Arduino Mega
+# define TIMER_PWM_PIN  6  // Arduino Mega
 #else
-#	error "Please add OC4A pin number here\n"
+# error "Please add OC4A pin number here\n"
 #endif
 
 //---------------------------------------------------------
@@ -457,11 +457,11 @@ EXTERN  volatile irparams_t  irparams;
 
 //-----------------
 #if defined(CORE_OC5A_PIN)
-#	define TIMER_PWM_PIN  CORE_OC5A_PIN
+# define TIMER_PWM_PIN  CORE_OC5A_PIN
 #elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-#	define TIMER_PWM_PIN  46  // Arduino Mega
+# define TIMER_PWM_PIN  46  // Arduino Mega
 #else
-#	error "Please add OC5A pin number here\n"
+# error "Please add OC5A pin number here\n"
 #endif
 
 //---------------------------------------------------------
@@ -470,16 +470,16 @@ EXTERN  volatile irparams_t  irparams;
 #elif defined(IR_USE_TIMER_CMT)
 
 #define TIMER_RESET ({     \
-	uint8_t tmp = CMT_MSC; \
-	CMT_CMD2 = 30;         \
+  uint8_t tmp = CMT_MSC; \
+  CMT_CMD2 = 30;         \
 })
 
 #define TIMER_ENABLE_PWM  do {                                         \
-	CORE_PIN5_CONFIG = PORT_PCR_MUX(2) | PORT_PCR_DSE | PORT_PCR_SRE;  \
+  CORE_PIN5_CONFIG = PORT_PCR_MUX(2) | PORT_PCR_DSE | PORT_PCR_SRE;  \
 } while(0)
 
 #define TIMER_DISABLE_PWM  do {                                        \
-	CORE_PIN5_CONFIG = PORT_PCR_MUX(1) | PORT_PCR_DSE | PORT_PCR_SRE;  \
+  CORE_PIN5_CONFIG = PORT_PCR_MUX(1) | PORT_PCR_DSE | PORT_PCR_SRE;  \
 } while(0)
 
 #define TIMER_ENABLE_INTR   NVIC_ENABLE_IRQ(IRQ_CMT)
@@ -488,43 +488,43 @@ EXTERN  volatile irparams_t  irparams;
 
 //-----------------
 #ifdef ISR
-#	undef ISR
+# undef ISR
 #endif
 #define  ISR(f)  void f(void)
 
 //-----------------
 #if (F_BUS == 48000000)
-#	define CMT_PPS_VAL  5
+# define CMT_PPS_VAL  5
 #else
-#	define CMT_PPS_VAL  2
+# define CMT_PPS_VAL  2
 #endif
 
 //-----------------
-#define TIMER_CONFIG_KHZ(val) ({ 	 \
-	SIM_SCGC4 |= SIM_SCGC4_CMT;      \
-	SIM_SOPT2 |= SIM_SOPT2_PTD7PAD;  \
-	CMT_PPS    = CMT_PPS_VAL;        \
-	CMT_CGH1   = 2667 / val;         \
-	CMT_CGL1   = 5333 / val;         \
-	CMT_CMD1   = 0;                  \
-	CMT_CMD2   = 30;                 \
-	CMT_CMD3   = 0;                  \
-	CMT_CMD4   = 0;                  \
-	CMT_OC     = 0x60;               \
-	CMT_MSC    = 0x01;               \
+#define TIMER_CONFIG_KHZ(val) ({   \
+  SIM_SCGC4 |= SIM_SCGC4_CMT;      \
+  SIM_SOPT2 |= SIM_SOPT2_PTD7PAD;  \
+  CMT_PPS    = CMT_PPS_VAL;        \
+  CMT_CGH1   = 2667 / val;         \
+  CMT_CGL1   = 5333 / val;         \
+  CMT_CMD1   = 0;                  \
+  CMT_CMD2   = 30;                 \
+  CMT_CMD3   = 0;                  \
+  CMT_CMD4   = 0;                  \
+  CMT_OC     = 0x60;               \
+  CMT_MSC    = 0x01;               \
 })
 
 #define TIMER_CONFIG_NORMAL() ({  \
-	SIM_SCGC4 |= SIM_SCGC4_CMT;   \
-	CMT_PPS    = CMT_PPS_VAL;     \
-	CMT_CGH1   = 1;               \
-	CMT_CGL1   = 1;               \
-	CMT_CMD1   = 0;               \
-	CMT_CMD2   = 30               \
-	CMT_CMD3   = 0;               \
-	CMT_CMD4   = 19;              \
-	CMT_OC     = 0;               \
-	CMT_MSC    = 0x03;            \
+  SIM_SCGC4 |= SIM_SCGC4_CMT;   \
+  CMT_PPS    = CMT_PPS_VAL;     \
+  CMT_CGH1   = 1;               \
+  CMT_CGL1   = 1;               \
+  CMT_CMD1   = 0;               \
+  CMT_CMD2   = 30               \
+  CMT_CMD3   = 0;               \
+  CMT_CMD4   = 19;              \
+  CMT_OC     = 0;               \
+  CMT_MSC    = 0x03;            \
 })
 
 #define TIMER_PWM_PIN  5
@@ -542,20 +542,20 @@ EXTERN  volatile irparams_t  irparams;
 #endif
 #define ISR(f) void f(void)
 #define TIMER_CONFIG_KHZ(val) ({                     \
-	SIM_SCGC6 |= SIM_SCGC6_TPM1;                 \
-	FTM1_SC = 0;                                 \
-	FTM1_CNT = 0;                                \
-	FTM1_MOD = (F_PLL/2000) / val - 1;           \
-	FTM1_C0V = (F_PLL/6000) / val - 1;           \
-	FTM1_SC = FTM_SC_CLKS(1) | FTM_SC_PS(0);     \
+  SIM_SCGC6 |= SIM_SCGC6_TPM1;                 \
+  FTM1_SC = 0;                                 \
+  FTM1_CNT = 0;                                \
+  FTM1_MOD = (F_PLL/2000) / val - 1;           \
+  FTM1_C0V = (F_PLL/6000) / val - 1;           \
+  FTM1_SC = FTM_SC_CLKS(1) | FTM_SC_PS(0);     \
 })
 #define TIMER_CONFIG_NORMAL() ({                     \
-	SIM_SCGC6 |= SIM_SCGC6_TPM1;                 \
-	FTM1_SC = 0;                                 \
-	FTM1_CNT = 0;                                \
-	FTM1_MOD = (F_PLL/40000) - 1;                \
-	FTM1_C0V = 0;                                \
-	FTM1_SC = FTM_SC_CLKS(1) | FTM_SC_PS(0) | FTM_SC_TOF | FTM_SC_TOIE; \
+  SIM_SCGC6 |= SIM_SCGC6_TPM1;                 \
+  FTM1_SC = 0;                                 \
+  FTM1_CNT = 0;                                \
+  FTM1_MOD = (F_PLL/40000) - 1;                \
+  FTM1_C0V = 0;                                \
+  FTM1_SC = FTM_SC_CLKS(1) | FTM_SC_PS(0) | FTM_SC_TOF | FTM_SC_TOIE; \
 })
 #define TIMER_PWM_PIN        16
 
@@ -597,6 +597,7 @@ EXTERN  volatile irparams_t  irparams;
 // Unknown Timer
 //
 #else
-#	error "Internal code configuration error, no known IR_USE_TIMER# defined\n"
+# error "Internal code configuration error, no known IR_USE_TIMER# defined\n"
 #endif
 #endif
+
