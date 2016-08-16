@@ -1,6 +1,7 @@
 Ultra low cost IR timing gate transponder compatible with i-lap rc timing gates. How low can you go? We've seen builds as cheap as $3 per transponder!
 
 Comes ready for you to input any 7 digit transponder ID you'd like, edit the arduino file to set which transponder ID to use.
+ID range: 2097152 to 9999999
 
 Required parts:
 * Arduino nano or pro mini (5v pro mini preferred)
