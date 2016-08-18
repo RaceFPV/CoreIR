@@ -14,6 +14,10 @@
 //change transponder ID # by setting a different transponder number for tx_id
 long tx_id = 4444444;
 long tx_alt_id = 8901234;
+
+//if using an attiny, comment out the atmega line below otherwise leave as is.
+#define atmega
+
 //CONFIGURATION END
 
 
@@ -26,12 +30,14 @@ long tx_alt_id = 8901234;
 
 
 // Include eeprom library for usb connectivity
-#include <EEPROM.h>
+#ifdef atmega
+  #include <EEPROM.h>
+  #include "saved.h"
+#endif
 
 // Include libraries for ir led frequency and speed
 #include "IRrem.h"
 #include "IRsnd.h"
-#include "saved.h"
 
 
 IRsend irsend;
@@ -255,15 +261,17 @@ void makeOutputCode(unsigned long tcode) {
 }
 
 void setup() {
-  // save the new transponder numbers in eeprom if they are not already there
-  if (EEPROMReadlong(0) != tx_id) {
-    EEPROMWritelong(0, tx_id);
-  }
-  if (EEPROMReadlong(4) != tx_alt_id) {
-    EEPROMWritelong(4, tx_alt_id);
-  }
-  long tx_id = EEPROMReadlong(0);
-  long tx_alt_id = EEPROMReadlong(4);
+  #ifdef atmega
+    // save the new transponder numbers in eeprom if they are not already there
+    if (EEPROMReadlong(0) != tx_id) {
+      EEPROMWritelong(0, tx_id);
+    }
+    if (EEPROMReadlong(4) != tx_alt_id) {
+      EEPROMWritelong(4, tx_alt_id);
+    }
+    long tx_id = EEPROMReadlong(0);
+    long tx_alt_id = EEPROMReadlong(4);
+  #endif
   // set up jumper bridge for alternate ID
   pinMode(bridgePinIn, INPUT);
   digitalWrite(bridgePinIn, HIGH);
