@@ -12,8 +12,8 @@
 */
 //CONFIGURABLE SECTION - SET TRANSPONDER ID
 //change transponder ID # by setting a different transponder number for tx_id
-#define tx_id     1234567
-#define tx_alt_id 8901234
+long tx_id = 4444444;
+long tx_alt_id = 8901234;
 //CONFIGURATION END
 
 
@@ -24,8 +24,15 @@
 // Enable debug info on serial output
 // #define debug
 
+
+// Include eeprom library for usb connectivity
+#include <EEPROM.h>
+
+// Include libraries for ir led frequency and speed
 #include "IRrem.h"
 #include "IRsnd.h"
+#include "saved.h"
+
 
 IRsend irsend;
 
@@ -248,6 +255,15 @@ void makeOutputCode(unsigned long tcode) {
 }
 
 void setup() {
+  // save the new transponder numbers in eeprom if they are not already there
+  if (EEPROMReadlong(0) != tx_id) {
+    EEPROMWritelong(0, tx_id);
+  }
+  if (EEPROMReadlong(4) != tx_alt_id) {
+    EEPROMWritelong(4, tx_alt_id);
+  }
+  long tx_id = EEPROMReadlong(0);
+  long tx_alt_id = EEPROMReadlong(4);
   // set up jumper bridge for alternate ID
   pinMode(bridgePinIn, INPUT);
   digitalWrite(bridgePinIn, HIGH);
