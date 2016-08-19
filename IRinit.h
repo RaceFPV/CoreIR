@@ -194,7 +194,7 @@ EXTERN  volatile irparams_t  irparams;
   #define IR_USE_TIMER1     // tx = pin 9
 
 // ATtiny84
-#elif defined(__AVR_ATtiny84__)
+#elif defined(__AVR_ATtiny84__) || defined(__AVR_ATtiny167__)
   #define IR_USE_TIMER1     // tx = pin 6
 
 //ATtiny85
@@ -257,6 +257,8 @@ EXTERN  volatile irparams_t  irparams;
 # define TIMER_PWM_PIN  9              // Arduino Mega
 #elif defined(__AVR_ATmega644P__) || defined(__AVR_ATmega644__)
 # define TIMER_PWM_PIN  14             // Sanguino
+#elif defined(__AVR_ATtiny167__)
+# define TIMER_PWM_PIN 8
 #else
 # define TIMER_PWM_PIN  3              // Arduino Duemilanove, Diecimila, LilyPad, etc
 #endif

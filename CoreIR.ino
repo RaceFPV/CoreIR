@@ -16,7 +16,10 @@ long tx_id = 4444444;
 long tx_alt_id = 8901234;
 
 //if using an attiny, comment out the atmega line below otherwise leave as is.
-#define atmega
+//#define atmega
+
+//if using a arduino pro micro, uncomment the below line
+//#define micro
 
 //CONFIGURATION END
 
@@ -43,7 +46,12 @@ long tx_alt_id = 8901234;
 IRsend irsend;
 
 // Set up status LED
-const int ledPin =  13; 
+#ifdef micro
+  const int ledPin = 17;
+#else
+  const int ledPin = 13;
+#endif
+
 int ledState = LOW;
 unsigned long previousMillis = 0;
 const long interval = 100;
