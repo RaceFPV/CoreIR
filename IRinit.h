@@ -211,7 +211,7 @@ EXTERN  volatile irparams_t  irparams;
   #define IR_USE_TIMER1     // tx = pin 9
 
 // ATtiny84
-#elif defined(__AVR_ATtiny84__)
+#elif defined(__AVR_ATtiny84__) || defined(__AVR_ATtiny167__)
   #define IR_USE_TIMER1     // tx = pin 6
 
 //ATtiny85
