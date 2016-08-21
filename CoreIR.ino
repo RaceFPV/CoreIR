@@ -12,11 +12,15 @@
 */
 //CONFIGURABLE SECTION - SET TRANSPONDER ID
 //change transponder ID # by setting a different transponder number for tx_id
-long tx_id = 4444444;
+//WARNING: IDs set by CoreIR-Uplink tool will override these numbers
+long tx_id = 4242424;
 long tx_alt_id = 8901234;
 
 //if using an attiny, comment out the atmega line below otherwise leave as is.
 #define atmega
+
+//if using a arduino pro micro, uncomment the below line
+#define micro
 
 //CONFIGURATION END
 
@@ -26,7 +30,7 @@ long tx_alt_id = 8901234;
 #define bridgePinOut 6
 
 // Enable debug info on serial output
-// #define debug
+ #define debug
 
 
 // Include eeprom library for usb connectivity
@@ -43,7 +47,12 @@ long tx_alt_id = 8901234;
 IRsend irsend;
 
 // Set up status LED
-const int ledPin =  13; 
+#ifdef micro
+  const int ledPin = 17;
+#else
+  const int ledPin = 13;
+#endif
+
 int ledState = LOW;
 unsigned long previousMillis = 0;
 const long interval = 100;
@@ -264,13 +273,11 @@ void setup() {
   #ifdef atmega
     // save the new transponder numbers in eeprom if they are not already there
     if (EEPROMReadlong(0) != tx_id) {
-      EEPROMWritelong(0, tx_id);
+      long tx_id = EEPROMReadlong(0);
     }
     if (EEPROMReadlong(4) != tx_alt_id) {
-      EEPROMWritelong(4, tx_alt_id);
+      long tx_alt_id = EEPROMReadlong(4);
     }
-    long tx_id = EEPROMReadlong(0);
-    long tx_alt_id = EEPROMReadlong(4);
   #endif
   // set up jumper bridge for alternate ID
   pinMode(bridgePinIn, INPUT);

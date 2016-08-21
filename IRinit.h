@@ -171,7 +171,7 @@ EXTERN  volatile irparams_t  irparams;
   #define IR_USE_TIMER4_HS  // tx = pin 10
 
 // Teensy 3.0 / Teensy 3.1
-#elif defined(__MK20DX128__) || defined(__MK20DX256__)
+#elif defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
   #define IR_USE_TIMER_CMT  // tx = pin 5
 
 // Teensy-LC
@@ -184,13 +184,30 @@ EXTERN  volatile irparams_t  irparams;
   #define IR_USE_TIMER2     // tx = pin 1
   //#define IR_USE_TIMER3   // tx = pin 16
 
-// Sanguino
-#elif defined(__AVR_ATmega644P__) || defined(__AVR_ATmega644__)
+// MightyCore - ATmega1284
+#elif defined(__AVR_ATmega1284__) || defined(__AVR_ATmega1284P__)
   //#define IR_USE_TIMER1   // tx = pin 13
   #define IR_USE_TIMER2     // tx = pin 14
+  //#define IR_USE_TIMER3   // tx = pin 6
+
+// MightyCore - ATmega164, ATmega324, ATmega644
+#elif defined(__AVR_ATmega644__) || defined(__AVR_ATmega644P__) \
+|| defined(__AVR_ATmega324P__) || defined(__AVR_ATmega324A__) \
+|| defined(__AVR_ATmega324PA__) || defined(__AVR_ATmega164A__) \
+|| defined(__AVR_ATmega164P__) || defined(__AVR_ATmega32U4__)
+  //#define IR_USE_TIMER1   // tx = pin 13
+  #define IR_USE_TIMER2     // tx = pin 14
+  
+//MegaCore - ATmega64, ATmega128
+#elif defined(__AVR_ATmega64__) || defined(__AVR_ATmega128__)
+  #define IR_USE_TIMER1     // tx = pin 13
+
+// MightyCore - ATmega8535, ATmega16, ATmega32
+#elif defined(__AVR_ATmega8535__) || defined(__AVR_ATmega16__) || defined(__AVR_ATmega32__)
+  #define IR_USE_TIMER1     // tx = pin 13
 
 // Atmega8
-#elif defined(__AVR_ATmega8P__) || defined(__AVR_ATmega8__)
+#elif defined(__AVR_ATmega8__)
   #define IR_USE_TIMER1     // tx = pin 9
 
 // ATtiny84
@@ -202,6 +219,7 @@ EXTERN  volatile irparams_t  irparams;
   #define IR_USE_TIMER_TINY0   // tx = pin 1
 
 // Arduino Duemilanove, Diecimila, LilyPad, Mini, Fio, Nano, etc
+// ATmega48, ATmega88, ATmega168, ATmega328
 #else
   //#define IR_USE_TIMER1   // tx = pin 9
   #define IR_USE_TIMER2     // tx = pin 3
@@ -255,11 +273,15 @@ EXTERN  volatile irparams_t  irparams;
 # define TIMER_PWM_PIN  CORE_OC2B_PIN  // Teensy
 #elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 # define TIMER_PWM_PIN  9              // Arduino Mega
-#elif defined(__AVR_ATmega644P__) || defined(__AVR_ATmega644__)
-# define TIMER_PWM_PIN  14             // Sanguino
+#elif defined(__AVR_ATmega1284__) || defined(__AVR_ATmega1284P__) \
+|| defined(__AVR_ATmega644__) || defined(__AVR_ATmega644P__) \
+|| defined(__AVR_ATmega324P__) || defined(__AVR_ATmega324A__) \
+|| defined(__AVR_ATmega324PA__) || defined(__AVR_ATmega164A__) \
+|| defined(__AVR_ATmega164P__)
+# define TIMER_PWM_PIN  14             // MightyCore
 #else
 # define TIMER_PWM_PIN  3              // Arduino Duemilanove, Diecimila, LilyPad, etc
-#endif
+#endif               // ATmega48, ATmega88, ATmega168, ATmega328
 
 //---------------------------------------------------------
 // Timer1 (16 bits)
@@ -271,7 +293,9 @@ EXTERN  volatile irparams_t  irparams;
 #define TIMER_DISABLE_PWM  (TCCR1A &= ~(_BV(COM1A1)))
 
 //-----------------
-#if defined(__AVR_ATmega8P__) || defined(__AVR_ATmega8__)
+#if defined(__AVR_ATmega8__) || defined(__AVR_ATmega8535__) \
+|| defined(__AVR_ATmega16__) || defined(__AVR_ATmega32__) \
+|| defined(__AVR_ATmega64__) || defined(__AVR_ATmega128__)
 # define TIMER_ENABLE_INTR   (TIMSK |= _BV(OCIE1A))
 # define TIMER_DISABLE_INTR  (TIMSK &= ~_BV(OCIE1A))
 #else
@@ -302,13 +326,20 @@ EXTERN  volatile irparams_t  irparams;
 # define TIMER_PWM_PIN  CORE_OC1A_PIN  // Teensy
 #elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 # define TIMER_PWM_PIN  11             // Arduino Mega
-#elif defined(__AVR_ATmega644P__) || defined(__AVR_ATmega644__)
-# define TIMER_PWM_PIN  13             // Sanguino
+#elif defined(__AVR_ATmega64__) || defined(__AVR_ATmega128__)
+# define TIMER_PWM_PIN  13       // MegaCore
+#elif defined(__AVR_ATmega1284__) || defined(__AVR_ATmega1284P__) \
+|| defined(__AVR_ATmega644__) || defined(__AVR_ATmega644P__) \
+|| defined(__AVR_ATmega324P__) || defined(__AVR_ATmega324A__) \
+|| defined(__AVR_ATmega324PA__) || defined(__AVR_ATmega164A__) \
+|| defined(__AVR_ATmega164P__) || defined(__AVR_ATmega32__) \
+|| defined(__AVR_ATmega16__) || defined(__AVR_ATmega8535__)
+# define TIMER_PWM_PIN  13             // MightyCore
 #elif defined(__AVR_ATtiny84__)
-# define TIMER_PWM_PIN  6
+#   define TIMER_PWM_PIN  6
 #else
 # define TIMER_PWM_PIN  9              // Arduino Duemilanove, Diecimila, LilyPad, etc
-#endif
+#endif               // ATmega48, ATmega88, ATmega168, ATmega328
 
 //---------------------------------------------------------
 // Timer3 (16 bits)
@@ -342,6 +373,8 @@ EXTERN  volatile irparams_t  irparams;
 # define TIMER_PWM_PIN  CORE_OC3A_PIN  // Teensy
 #elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 # define TIMER_PWM_PIN  5              // Arduino Mega
+#elif defined(__AVR_ATmega1284__) || defined(__AVR_ATmega1284P__)
+# define TIMER_PWM_PIN  6              // MightyCore
 #else
 # error "Please add OC3A pin number here\n"
 #endif
@@ -470,7 +503,7 @@ EXTERN  volatile irparams_t  irparams;
 #elif defined(IR_USE_TIMER_CMT)
 
 #define TIMER_RESET ({     \
-  uint8_t tmp = CMT_MSC; \
+  uint8_t tmp __attribute__((unused)) = CMT_MSC; \
   CMT_CMD2 = 30;         \
 })
 
@@ -493,19 +526,18 @@ EXTERN  volatile irparams_t  irparams;
 #define  ISR(f)  void f(void)
 
 //-----------------
-#if (F_BUS == 48000000)
-# define CMT_PPS_VAL  5
-#else
-# define CMT_PPS_VAL  2
+#define CMT_PPS_DIV  ((F_BUS + 7999999) / 8000000)
+#if F_BUS < 8000000
+#error IRremote requires at least 8 MHz on Teensy 3.x
 #endif
 
 //-----------------
 #define TIMER_CONFIG_KHZ(val) ({   \
   SIM_SCGC4 |= SIM_SCGC4_CMT;      \
   SIM_SOPT2 |= SIM_SOPT2_PTD7PAD;  \
-  CMT_PPS    = CMT_PPS_VAL;        \
-  CMT_CGH1   = 2667 / val;         \
-  CMT_CGL1   = 5333 / val;         \
+  CMT_PPS    = CMT_PPS_DIV - 1;    \
+  CMT_CGH1   = ((F_BUS / CMT_PPS_DIV / 3000) + ((val)/2)) / (val); \
+  CMT_CGL1   = ((F_BUS / CMT_PPS_DIV / 1500) + ((val)/2)) / (val); \
   CMT_CMD1   = 0;                  \
   CMT_CMD2   = 30;                 \
   CMT_CMD3   = 0;                  \
@@ -516,13 +548,13 @@ EXTERN  volatile irparams_t  irparams;
 
 #define TIMER_CONFIG_NORMAL() ({  \
   SIM_SCGC4 |= SIM_SCGC4_CMT;   \
-  CMT_PPS    = CMT_PPS_VAL;     \
+  CMT_PPS    = CMT_PPS_DIV - 1; \
   CMT_CGH1   = 1;               \
   CMT_CGL1   = 1;               \
   CMT_CMD1   = 0;               \
-  CMT_CMD2   = 30               \
+  CMT_CMD2   = 30;              \
   CMT_CMD3   = 0;               \
-  CMT_CMD4   = 19;              \
+  CMT_CMD4   = (F_BUS / 160000 + CMT_PPS_DIV / 2) / CMT_PPS_DIV - 31; \
   CMT_OC     = 0;               \
   CMT_MSC    = 0x03;            \
 })
