@@ -16,11 +16,16 @@
 long tx_id = 4242424;
 long tx_alt_id = 8901234;
 
-//if using an attiny, comment out the atmega line below otherwise leave as is.
-//#define atmega
+//if using an attiny
+#ifdef defined(__AVR_ATtiny84__) || defined(__AVR_ATtiny167__) || defined(__AVR_ATtiny85)
+#else
+  #define atmega
+#endif
 
-//if using a arduino pro micro, uncomment the below line
-#define micro
+//if using a arduino pro micro
+#ifdef defined(__AVR_ATmega32U4__)
+  #define micro
+#endif
 
 //CONFIGURATION END
 
