@@ -2,7 +2,7 @@
 #include "IRinit.h"
 
 //+=============================================================================
-void  IRsend::sendRaw (unsigned int buf[],  unsigned int len,  unsigned int hz)
+void  IRsend::sendRaw (const unsigned int buf[],  unsigned int len,  unsigned int hz)
 {
   // Set IR carrier frequency
   enableIROut(hz);

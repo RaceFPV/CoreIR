@@ -167,8 +167,8 @@ EXTERN  volatile irparams_t  irparams;
 // Teensy 2.0
 #elif defined(__AVR_ATmega32U4__)
   //#define IR_USE_TIMER1   // tx = pin 14
-  //#define IR_USE_TIMER3   // tx = pin 9
-  #define IR_USE_TIMER4_HS  // tx = pin 10
+  #define IR_USE_TIMER3   // tx = pin 9
+  //#define IR_USE_TIMER4_HS  // tx = pin 10
 
 // Teensy 3.0 / Teensy 3.1
 #elif defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
@@ -194,7 +194,7 @@ EXTERN  volatile irparams_t  irparams;
 #elif defined(__AVR_ATmega644__) || defined(__AVR_ATmega644P__) \
 || defined(__AVR_ATmega324P__) || defined(__AVR_ATmega324A__) \
 || defined(__AVR_ATmega324PA__) || defined(__AVR_ATmega164A__) \
-|| defined(__AVR_ATmega164P__) || defined(__AVR_ATmega32U4__)
+|| defined(__AVR_ATmega164P__)
   //#define IR_USE_TIMER1   // tx = pin 13
   #define IR_USE_TIMER2     // tx = pin 14
   
@@ -337,8 +337,10 @@ EXTERN  volatile irparams_t  irparams;
 # define TIMER_PWM_PIN  13             // MightyCore
 #elif defined(__AVR_ATtiny84__)
 #   define TIMER_PWM_PIN  6
+#elif defined(__AVR_ATmega32U4__)
+#define TIMER_PWM_PIN 5
 #else
-# define TIMER_PWM_PIN  9              // Arduino Duemilanove, Diecimila, LilyPad, etc
+# define TIMER_PWM_PIN  5              // Arduino Duemilanove, Diecimila, LilyPad, etc
 #endif               // ATmega48, ATmega88, ATmega168, ATmega328
 
 //---------------------------------------------------------
@@ -374,9 +376,9 @@ EXTERN  volatile irparams_t  irparams;
 #elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 # define TIMER_PWM_PIN  5              // Arduino Mega
 #elif defined(__AVR_ATmega1284__) || defined(__AVR_ATmega1284P__)
-# define TIMER_PWM_PIN  6              // MightyCore
+# define TIMER_PWM_PIN  5              // MightyCore
 #else
-# error "Please add OC3A pin number here\n"
+# define TIMER_PWM_PIN 5
 #endif
 
 //---------------------------------------------------------
@@ -417,13 +419,13 @@ EXTERN  volatile irparams_t  irparams;
 })
 
 //-----------------
-#if defined(CORE_OC4A_PIN)
-# define TIMER_PWM_PIN  CORE_OC4A_PIN  // Teensy
-#elif defined(__AVR_ATmega32U4__)
-# define TIMER_PWM_PIN  13             // Leonardo
-#else
-# error "Please add OC4A pin number here\n"
-#endif
+//#if defined(CORE_OC4A_PIN)
+//# define TIMER_PWM_PIN  CORE_OC4A_PIN  // Teensy
+//#elif defined(__AVR_ATmega32U4__)
+#define TIMER_PWM_PIN  10             // Leonardo
+//#else
+//# error "Please add OC4A pin number here\n"
+//#endif
 
 //---------------------------------------------------------
 // Timer4 (16 bits)
@@ -440,7 +442,7 @@ EXTERN  volatile irparams_t  irparams;
 #define TIMER_CONFIG_KHZ(val) ({ \
   const uint16_t pwmval = SYSCLOCK / 2000 / (val); \
   TCCR4A = _BV(WGM41); \
-  TCCR4B = _BV(WGM43) | _BV(CS40); \
+  TCCR4B = _BV(WGM40) | _BV(CS40); \
   ICR4 = pwmval; \
   OCR4A = pwmval / 3; \
 })
@@ -458,7 +460,7 @@ EXTERN  volatile irparams_t  irparams;
 #elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 # define TIMER_PWM_PIN  6  // Arduino Mega
 #else
-# error "Please add OC4A pin number here\n"
+#define TIMER_PWM_PIN 10
 #endif
 
 //---------------------------------------------------------

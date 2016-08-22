@@ -17,20 +17,24 @@ long tx_id = 4242424;
 long tx_alt_id = 8901234;
 
 //if using an attiny, comment out the atmega line below otherwise leave as is.
-#define atmega
+//#define atmega
 
 //if using a arduino pro micro, uncomment the below line
 #define micro
 
 //CONFIGURATION END
 
-
+#ifdef micro
 // Set up alternate ID jumper bridge
-#define bridgePinIn 5
-#define bridgePinOut 6
-
+  #define bridgePinIn 15
+  #define bridgePinOut 14
+#else
+// Set up alternate ID jumper bridge
+  #define bridgePinIn 5
+  #define bridgePinOut 6
+#endif
 // Enable debug info on serial output
- #define debug
+ //#define debug
 
 
 // Include eeprom library for usb connectivity
@@ -42,7 +46,7 @@ long tx_alt_id = 8901234;
 // Include libraries for ir led frequency and speed
 #include "IRrem.h"
 #include "IRsnd.h"
-
+//#include <IRremote.h>
 
 IRsend irsend;
 
@@ -59,9 +63,13 @@ const long interval = 100;
 
 unsigned int outputcode[60];
 byte codeLen = 0;
-int khz = 15;
-#define framewidth 24 // pulses per data bit
-
+#ifdef micro
+  int khz = 460;
+  #define framewidth 24 // pulses per data bit
+#else
+  int khz = 15;
+  #define framewidth 24 // pulses per data bit
+#endif
 
 // CRC checksum generation
 uint16_t calc_crc(byte *msg,int n)
