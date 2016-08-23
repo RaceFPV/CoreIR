@@ -30,7 +30,7 @@ long tx_alt_id = 8901234;
 //CONFIGURATION END
 
 #ifdef micro
-// Set up alternate ID jumper bridge
+// Set up alternate ID jumper bridge, shift pins because micro is special
   #define bridgePinIn 15
   #define bridgePinOut 14
 #else
@@ -51,7 +51,6 @@ long tx_alt_id = 8901234;
 // Include libraries for ir led frequency and speed
 #include "IRrem.h"
 #include "IRsnd.h"
-//#include <IRremote.h>
 
 IRsend irsend;
 
@@ -68,7 +67,7 @@ const long interval = 100;
 
 unsigned int outputcode[60];
 byte codeLen = 0;
-#ifdef micro
+#ifdef atmega
   int khz = 460;
   #define framewidth 24 // pulses per data bit
 #else
@@ -328,7 +327,10 @@ void loop() {
   irsend.sendRaw(outputcode, codeLen, khz);
   delayMicroseconds(2600);
 
-  // blink the LED if applicable
+  // blink the LED if applicable, blink slower for alt id
+  if (digitalRead(bridgePinIn)) {
+    int interval = 1000;
+  }
   unsigned long currentMillis = millis();
   if (currentMillis - previousMillis >= interval) {
     // save the last time you blinked the LED
