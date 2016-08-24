@@ -6,8 +6,26 @@
 // Interrupt code based on NECIRrcv by Joe Knapp
 //******************************************************************************
 
-#include "IRrem.h"
 #include "IRinit.h"
+
+//------------------------------------------------------------------------------
+// Main class for sending IR
+//
+#ifndef IRrem_h
+#define IRrem_h
+
+class IRsend
+{
+  public:
+    IRsend () { }
+
+    void  custom_delay_usec (unsigned long uSecs);
+    void  enableIROut     (int khz) ;
+    void  mark            (unsigned int usec) ;
+    void  space           (unsigned int usec) ;
+    void  sendRaw         (const unsigned int buf[],  unsigned int len,  unsigned int hz) ;
+} ;
+#endif
 
 //+=============================================================================
 void  IRsend::sendRaw (const unsigned int buf[],  unsigned int len,  unsigned int hz)

@@ -13,7 +13,7 @@
 //CONFIGURABLE SECTION - SET TRANSPONDER ID
 //Change transponder ID # by setting a different transponder number for tx_id
 //WARNING: IDs set by CoreIR-Uplink tool will override these numbers
-const long tx_id = 0113113;
+const long tx_id = 8753099;
 const long tx_alt_id = 8901234;
 
 // Enable debug info on serial output
@@ -24,7 +24,7 @@ const long tx_alt_id = 8901234;
   //if using an attiny build with all defaults, don't define anything
 #elif defined(__AVR_ATmega32U4__)
   //if using an arduino micro build with eeprom enabled and different LED pin
-  #define atmega
+  //#define atmega
   #define micro
 #else
   //if using an atmega328p or similar build with eeprom enabled
@@ -53,7 +53,6 @@ const long tx_alt_id = 8901234;
 #endif
 
 // Include libraries for IR LED frequency, speed and encoding
-#include "IRrem.h"
 #include "IRsnd.h"
 #include "Encode.h"
 
@@ -95,14 +94,14 @@ void setup() {
       Serial.print("STD ");
       Serial.println(tx_id);
     #endif
-    interval = 155; // Blink LED faster for regular id by default
+    interval = 200; // Blink LED faster for regular id by default
     makeOutputCode(tx_id); // use alternate ID if unbridged
   } else {
     #ifdef debug
       Serial.print("ALT ");
       Serial.println(tx_alt_id);
     #endif
-    interval = 1005; // Blink LED slower for alt id
+    interval = 1000; // Blink LED slower for alt id
     makeOutputCode(tx_alt_id); // use standard ID otherwise
   }
   
@@ -113,7 +112,7 @@ void setup() {
 void loop() {
   //Send the IR signal, then wait the appropriate amount of time before re-sending
   irsend.sendRaw(outputcode, codeLen, khz);
-  delayMicroseconds(500);
+  delayMicroseconds(700);
 
   // -----Status LED blink code start -----
     unsigned long currentMillis = millis();
@@ -130,5 +129,5 @@ void loop() {
       digitalWrite(ledPin, ledState);
     // -----LED blink code end -----
   }
-  delayMicroseconds(800);
+  delayMicroseconds(700);
 }

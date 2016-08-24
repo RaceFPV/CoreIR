@@ -1,4 +1,4 @@
-//init some variables
+//init some variables, set the freq based on which clock we end up using (based on the chipset)
 #if defined(atmega) || defined(micro)
   int khz = 460;
   #define framewidth 24 // pulses per data bit
