@@ -13,14 +13,14 @@
 //CONFIGURABLE SECTION - SET TRANSPONDER ID
 //Change transponder ID # by setting a different transponder number for tx_id
 //WARNING: IDs set by CoreIR-Uplink tool will override these numbers
-const long tx_id = 4998673;
+const long tx_id = 8888888;
 const long tx_alt_id = 8901234;
 
 // Enable debug info on serial output
-#define debug
+//#define debug
 
 // New softserial output ---- TESTING
-#define softout
+//#define softout
 
 //check which arduino board we are using and build accordingly
 #if defined(__AVR_ATtiny84__) || defined(__AVR_ATtiny167__) || defined(__AVR_ATtiny85)
