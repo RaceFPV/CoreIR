@@ -66,10 +66,15 @@ void makeOutputCode(unsigned long tcode) {
   #ifdef debug
     Serial.println("Initial code: ");
     Serial.print(fullcode[0], HEX);
+    Serial.print(" ");
     Serial.print(fullcode[1], HEX);
+    Serial.print(" ");
     Serial.print(fullcode[2], HEX);
+    Serial.print(" ");
     Serial.print(fullcode[3], HEX);
+    Serial.print(" ");
     Serial.print(fullcode[4], HEX);
+    Serial.print(" ");
     Serial.println(fullcode[5], HEX);
   #endif
   
@@ -79,16 +84,33 @@ void makeOutputCode(unsigned long tcode) {
   crc_out = calc_crc(CRC1,4); //Calculate CRC on-the-fly         
  
   // fill in check bits
-  fullcode[1] = highByte(crc_out);
-  fullcode[5] = lowByte(crc_out);
+  fullcode[1] = (crc_out>>8) & 0xff;
+  fullcode[5] = crc_out & 0xff;
   
   #ifdef debug
-    Serial.println("CRC: ");
-    Serial.print(fullcode[0], HEX);
-    Serial.print(fullcode[1], HEX);
-    Serial.print(fullcode[2], HEX);
-    Serial.print(fullcode[3], HEX);
+    Serial.println("Feeding bytes into CRC16 XMODEM: ");
     Serial.print(fullcode[4], HEX);
+    Serial.print(" ");
+    Serial.print(fullcode[3], HEX);
+    Serial.print(" ");
+    Serial.print(fullcode[2], HEX);
+    Serial.print(" ");
+    Serial.println(fullcode[0], HEX);
+    Serial.println("Got back CRC high byte: ");
+    Serial.println(fullcode[1], HEX);
+    Serial.println("CRC low byte: ");
+    Serial.println(fullcode[5], HEX);
+    Serial.println("Full code before inversion: ");
+    Serial.print(fullcode[0], HEX);
+    Serial.print(" ");
+    Serial.print(fullcode[1], HEX);
+    Serial.print(" ");
+    Serial.print(fullcode[2], HEX);
+    Serial.print(" ");
+    Serial.print(fullcode[3], HEX);
+    Serial.print(" ");
+    Serial.print(fullcode[4], HEX);
+    Serial.print(" ");
     Serial.println(fullcode[5], HEX);
   #endif
   
@@ -101,12 +123,18 @@ void makeOutputCode(unsigned long tcode) {
   fullcode[5] = ~fullcode[5];
 
   #ifdef debug
-    Serial.println("Inverted: ");
+    Serial.println("Full code after inversion: ");
+    Serial.print("0"); // fix an issue where leading 0 in hex does not appear in serial.print
     Serial.print(fullcode[0], HEX);
+    Serial.print(" ");
     Serial.print(fullcode[1], HEX);
+    Serial.print(" ");
     Serial.print(fullcode[2], HEX);
+    Serial.print(" ");
     Serial.print(fullcode[3], HEX);
+    Serial.print(" ");
     Serial.print(fullcode[4], HEX);
+    Serial.print(" ");
     Serial.println(fullcode[5], HEX);
   #endif
 

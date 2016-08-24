@@ -13,7 +13,7 @@
 //CONFIGURABLE SECTION - SET TRANSPONDER ID
 //Change transponder ID # by setting a different transponder number for tx_id
 //WARNING: IDs set by CoreIR-Uplink tool will override these numbers
-const long tx_id = 8753099;
+const long tx_id = 4998673;
 const long tx_alt_id = 8901234;
 
 // Enable debug info on serial output
