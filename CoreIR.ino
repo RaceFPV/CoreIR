@@ -17,7 +17,7 @@ const long tx_id = 8753099;
 const long tx_alt_id = 8901234;
 
 // Enable debug info on serial output
- //#define debug
+#define debug
 
 //check which arduino board we are using and build accordingly
 #if defined(__AVR_ATtiny84__) || defined(__AVR_ATtiny167__) || defined(__AVR_ATtiny85)
@@ -83,6 +83,7 @@ void setup() {
   
   #ifdef debug
     Serial.begin(9600);
+    while (!Serial)
   #endif
 
   // Generate timecode
