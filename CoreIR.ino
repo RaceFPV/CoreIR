@@ -13,7 +13,7 @@
 //CONFIGURABLE SECTION - SET TRANSPONDER ID
 //Change transponder ID # by setting a different transponder number for tx_id
 //WARNING: IDs set by CoreIR-Uplink tool will override these numbers
-long tx_id = 4242424;
+long tx_id = 1111111;
 long tx_alt_id = 8901234;
 
 // Enable debug info on serial output
@@ -34,8 +34,8 @@ long tx_alt_id = 8901234;
 //TODO, set pins for attiny85 boards
 #ifdef micro
   // Set up alternate ID jumper bridge, shift pins because micro is special and uses pin 5 for IR output
-  #define bridgePinIn 15
-  #define bridgePinOut 14
+  #define bridgePinIn 14
+  #define bridgePinOut 15
   // Change the status LED location to the proper pin for the atmega32U4
   const int ledPin = 17;
 #else
@@ -62,7 +62,7 @@ IRsend irsend;
 
 // Set up status LED
 int ledState = LOW;
-const long interval = 100; // Blink LED faster for regular id by default
+long interval = 0;
 unsigned long previousMillis = 0; // Allow status LED to blink without sacraficing a timer
 
 void setup() {
@@ -92,17 +92,18 @@ void setup() {
   #endif
   if (digitalRead(bridgePinIn)) {
     #ifdef debug
-      Serial.print("ALT ");
-      Serial.println(tx_alt_id);
-    #endif
-    const long interval = 1000; // Blink LED slower for alt id
-    makeOutputCode(tx_alt_id); // use alternate ID if unbridged
-  } else {
-    #ifdef debug
       Serial.print("STD ");
       Serial.println(tx_id);
     #endif
-    makeOutputCode(tx_id); // use standard ID otherwise
+    interval = 155; // Blink LED faster for regular id by default
+    makeOutputCode(tx_id); // use alternate ID if unbridged
+  } else {
+    #ifdef debug
+      Serial.print("ALT ");
+      Serial.println(tx_alt_id);
+    #endif
+    interval = 1005; // Blink LED slower for alt id
+    makeOutputCode(tx_alt_id); // use standard ID otherwise
   }
   
   // Set up for blinking the status LED
@@ -112,7 +113,7 @@ void setup() {
 void loop() {
   //Send the IR signal, then wait the appropriate amount of time before re-sending
   irsend.sendRaw(outputcode, codeLen, khz);
-  delayMicroseconds(2600);
+  delayMicroseconds(500);
 
   // -----Status LED blink code start -----
     unsigned long currentMillis = millis();
@@ -129,4 +130,5 @@ void loop() {
       digitalWrite(ledPin, ledState);
     // -----LED blink code end -----
   }
+  delayMicroseconds(800);
 }
