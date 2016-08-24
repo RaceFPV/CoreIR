@@ -1,5 +1,5 @@
 //init some variables
-#ifdef atmega
+#if defined(atmega) || defined(micro)
   int khz = 460;
   #define framewidth 24 // pulses per data bit
 #else

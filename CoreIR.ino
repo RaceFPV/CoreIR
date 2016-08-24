@@ -6,15 +6,15 @@
 * Note that using non-random ID numbers will increase your chances of encountering 
 * another unit using the same ID.
 * 
-* IDs starting with 0 and those with many repeated 0s may not register correctly.
+* !!!!IDs with repeated numbers may not register every pass. For best results don't repeat the same digit multiple times in a row!!!!
 * Test ID code with system before using, if possible.
 * 
 */
 //CONFIGURABLE SECTION - SET TRANSPONDER ID
 //Change transponder ID # by setting a different transponder number for tx_id
 //WARNING: IDs set by CoreIR-Uplink tool will override these numbers
-long tx_id = 1111111;
-long tx_alt_id = 8901234;
+const long tx_id = 0113113;
+const long tx_alt_id = 8901234;
 
 // Enable debug info on serial output
  //#define debug
