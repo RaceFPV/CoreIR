@@ -11,59 +11,59 @@
 * 
 */
 //CONFIGURABLE SECTION - SET TRANSPONDER ID
-//change transponder ID # by setting a different transponder number for tx_id
+//Change transponder ID # by setting a different transponder number for tx_id
 //WARNING: IDs set by CoreIR-Uplink tool will override these numbers
 long tx_id = 4242424;
 long tx_alt_id = 8901234;
 
-//if using an attiny
-#if defined(__AVR_ATtiny84__) || defined(__AVR_ATtiny167__) || defined(__AVR_ATtiny85)
-#else
-  #define atmega
-#endif
-
-//if using a arduino pro micro
-#if defined(__AVR_ATmega32U4__)
-  #define micro
-#endif
-
-//CONFIGURATION END
-
-#ifdef micro
-// Set up alternate ID jumper bridge, shift pins because micro is special
-  #define bridgePinIn 15
-  #define bridgePinOut 14
-#else
-// Set up alternate ID jumper bridge
-  #define bridgePinIn 5
-  #define bridgePinOut 6
-#endif
 // Enable debug info on serial output
  //#define debug
 
-// Include eeprom library for usb connectivity if applicable
+//check which arduino board we are using and build accordingly
+#if defined(__AVR_ATtiny84__) || defined(__AVR_ATtiny167__) || defined(__AVR_ATtiny85)
+  //if using an attiny build with all defaults, don't define anything
+#elif defined(__AVR_ATmega32U4__)
+  //if using an arduino micro build with eeprom enabled and different LED pin
+  #define atmega
+  #define micro
+#else
+  //if using an atmega328p or similar build with eeprom enabled
+  #define atmega
+#endif
+
+//TODO, set pins for attiny85 boards
+#ifdef micro
+  // Set up alternate ID jumper bridge, shift pins because micro is special and uses pin 5 for IR output
+  #define bridgePinIn 15
+  #define bridgePinOut 14
+  // Change the status LED location to the proper pin for the atmega32U4
+  const int ledPin = 17;
+#else
+  // Set up alternate ID jumper bridge using normal pins 5 and 6
+  #define bridgePinIn 5
+  #define bridgePinOut 6
+  // Use the normal status LED
+  const int ledPin = 13;
+#endif
+
+// Include eeprom library for usb connectivity and CoreIR-Uplink ID saving
 #ifdef atmega
   #include <EEPROM.h>
   #include "saved.h"
 #endif
 
-// Include libraries for IR LED frequency and speed and encoding
+// Include libraries for IR LED frequency, speed and encoding
 #include "IRrem.h"
 #include "IRsnd.h"
 #include "Encode.h"
 
+// Initialize IR LED send code
 IRsend irsend;
 
 // Set up status LED
-#ifdef micro
-  const int ledPin = 17;
-#else
-  const int ledPin = 13;
-#endif
-
 int ledState = LOW;
-unsigned long previousMillis = 0;
-const long interval = 100;
+const long interval = 100; // Blink LED faster for regular id by default
+unsigned long previousMillis = 0; // Allow status LED to blink without sacraficing a timer
 
 void setup() {
   #ifdef atmega
@@ -75,6 +75,7 @@ void setup() {
       long tx_alt_id = EEPROMReadlong(4);
     }
   #endif
+
   // set up jumper bridge for alternate ID
   pinMode(bridgePinIn, INPUT);
   digitalWrite(bridgePinIn, HIGH);
@@ -94,7 +95,7 @@ void setup() {
       Serial.print("ALT ");
       Serial.println(tx_alt_id);
     #endif
-    int interval = 1000; // Blink LED slower for alt id
+    const long interval = 1000; // Blink LED slower for alt id
     makeOutputCode(tx_alt_id); // use alternate ID if unbridged
   } else {
     #ifdef debug
@@ -109,22 +110,23 @@ void setup() {
 }
 
 void loop() {
+  //Send the IR signal, then wait the appropriate amount of time before re-sending
   irsend.sendRaw(outputcode, codeLen, khz);
   delayMicroseconds(2600);
 
-  unsigned long currentMillis = millis();
-  if (currentMillis - previousMillis >= interval) {
-    // save the last time you blinked the LED
-    previousMillis = currentMillis;
-
-    // if the LED is off turn it on and vice-versa:
-    if (ledState == LOW) {
-      ledState = HIGH;
-    } else {
-      ledState = LOW;
-    }
-
-    // set the LED with the ledState of the variable:
-    digitalWrite(ledPin, ledState);
+  // -----Status LED blink code start -----
+    unsigned long currentMillis = millis();
+    if (currentMillis - previousMillis >= interval) {
+      // save the last time you blinked the LED
+      previousMillis = currentMillis;
+      // if the LED is off turn it on and vice-versa:
+      if (ledState == LOW) {
+        ledState = HIGH;
+      } else {
+        ledState = LOW;
+      }
+      // set the LED with the ledState of the variable:
+      digitalWrite(ledPin, ledState);
+    // -----LED blink code end -----
   }
 }

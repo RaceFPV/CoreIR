@@ -1,3 +1,11 @@
+//******************************************************************************
+// IRremote
+// Origial code by Ken Shirriff
+// Modified by Paul Stoffregen <paul@pjrc.com> to support other boards and timers
+// Modified by Michael Rickert <Slacker87> for more accurate IR LED timings
+// Interrupt code based on NECIRrcv by Joe Knapp
+//******************************************************************************
+
 #include "IRrem.h"
 #include "IRinit.h"
 
@@ -36,10 +44,6 @@ void  IRsend::space (unsigned int time)
   if (time > 0) IRsend::custom_delay_usec(time);
 }
 
-
-
-
-
 //+=============================================================================
 // Enables IR output.  The khz value controls the modulation frequency in kilohertz.
 // The IR output will be on pin 3 (OC2B).
@@ -56,21 +60,14 @@ void  IRsend::enableIROut (int khz)
 {
   // Disable the Timer2 Interrupt (which is used for receiving IR)
   TIMER_DISABLE_INTR; //Timer2 Overflow Interrupt
-
   pinMode(TIMER_PWM_PIN, OUTPUT);
   digitalWrite(TIMER_PWM_PIN, LOW); // When not sending PWM, we want it low
-
-  // COM2A = 00: disconnect OC2A
-  // COM2B = 00: disconnect OC2B; to send signal set to 10: OC2B non-inverted
-  // WGM2 = 101: phase-correct PWM with OCRA as top
-  // CS2  = 000: no prescaling
-  // The top value for the timer.  The modulation frequency will be SYSCLOCK / 2 / OCR2A.
   TIMER_CONFIG_KHZ(khz);
 }
 
 //+=============================================================================
 // Custom delay function that circumvents Arduino's delayMicroseconds limit
-
+//
 void IRsend::custom_delay_usec(unsigned long uSecs) {
   if (uSecs > 4) {
     unsigned long start = micros();
@@ -80,9 +77,6 @@ void IRsend::custom_delay_usec(unsigned long uSecs) {
     }
     while ( micros() < endMicros ) {} // normal wait
   } 
-  //else {
-  //  __asm__("nop\n\t"); // must have or compiler optimizes out
-  //}
 }
 
 
