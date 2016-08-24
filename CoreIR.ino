@@ -115,23 +115,39 @@ void setup() {
 
   // Generate timecode
   #ifdef debug
-    Serial.print("Building code: ");
+    Serial.print("Building code from: ");
   #endif
   if (digitalRead(bridgePinIn)) {
     #ifdef debug
-      Serial.print("STD ");
+      Serial.println("Main ID:");
       Serial.println(tx_id);
     #endif
     interval = 200; // Blink LED faster for regular id by default
     makeOutputCode(tx_id); // use alternate ID if unbridged
   } else {
     #ifdef debug
-      Serial.print("ALT ");
+      Serial.println("Alternate ID: ");
       Serial.println(tx_alt_id);
     #endif
     interval = 1000; // Blink LED slower for alt id
     makeOutputCode(tx_alt_id); // use standard ID otherwise
   }
+  
+  #if defined(debug) && defined(softout)
+    Serial.println("Sending: ");
+    Serial.print("0"); // fix an issue where leading 0 in hex does not appear in serial.print
+    Serial.print(bit1, HEX);
+    Serial.print(" ");
+    Serial.print(bit2, HEX);
+    Serial.print(" ");
+    Serial.print(bit3, HEX);
+    Serial.print(" ");
+    Serial.print(bit4, HEX);
+    Serial.print(" ");
+    Serial.print(bit5, HEX);
+    Serial.print(" ");
+    Serial.println(bit6, HEX);
+  #endif
   
   // Set up for blinking the status LED
   pinMode(ledPin, OUTPUT);
