@@ -9,6 +9,12 @@
 
 unsigned int outputcode[60];
 byte codeLen = 0;
+byte bit1;
+byte bit2;
+byte bit3;
+byte bit4;
+byte bit5;
+byte bit6;
 
 
 // CRC checksum generation
@@ -137,110 +143,118 @@ void makeOutputCode(unsigned long tcode) {
     Serial.print(" ");
     Serial.println(fullcode[5], HEX);
   #endif
-
-  // make reversed UART string
-  uint32_t UARThigh = 0;
-  uint32_t UARTlow = 0;
-
-  for (int b = 2; b >= 0; b--) {
-    UARTlow = UARTlow << 1;
-    UARTlow = UARTlow + 1; // add a 1
-    UARTlow = UARTlow << 8;
-    UARTlow = UARTlow + fullcode[b];
-    UARTlow = UARTlow << 1; // add a zero
-  }
-  for (int b = 5; b >= 3; b--) {
-    UARThigh = UARThigh << 1;
-    UARThigh = UARThigh + 1; // add a 1
-    UARThigh = UARThigh << 8;
-    UARThigh = UARThigh + fullcode[b];
-    UARThigh = UARThigh << 1; // add a zero
-  }
-  #ifdef debug
-    Serial.println("Inverted UART format: ");
-    Serial.print (UARThigh, BIN);
-    Serial.print (".");
-    Serial.println (UARTlow, BIN);
-  #endif
-
-  // count bits to generate timing code
-  byte numbits = 0;
-  byte lastbit = 0;
-
-  #ifdef debug
-    Serial.println("Parsing output code: ");
-    Serial.println("Count\tSearch\tData: ");
-  #endif
-  while (UARTlow) {
-    if ((UARTlow & B1) != lastbit) {
-      outputcode[codeLen] = numbits;
-      codeLen++;
-      numbits = 0;
-      if (lastbit) {
-        lastbit = 0;
-      } else {
-        lastbit = 1;
-      }
-    } else {
-      numbits++;
-      UARTlow = UARTlow >> 1;
-    }    
-
+  #if defined(softout)
+    bit1 = fullcode[0];
+    bit2 = fullcode[1];
+    bit3 = fullcode[2];
+    bit4 = fullcode[3];
+    bit5 = fullcode[4];
+    bit6 = fullcode[5];
+  #else
+    // make reversed UART string
+    uint32_t UARThigh = 0;
+    uint32_t UARTlow = 0;
+  
+    for (int b = 2; b >= 0; b--) {
+      UARTlow = UARTlow << 1;
+      UARTlow = UARTlow + 1; // add a 1
+      UARTlow = UARTlow << 8;
+      UARTlow = UARTlow + fullcode[b];
+      UARTlow = UARTlow << 1; // add a zero
+    }
+    for (int b = 5; b >= 3; b--) {
+      UARThigh = UARThigh << 1;
+      UARThigh = UARThigh + 1; // add a 1
+      UARThigh = UARThigh << 8;
+      UARThigh = UARThigh + fullcode[b];
+      UARThigh = UARThigh << 1; // add a zero
+    }
     #ifdef debug
-      Serial.print (numbits);
-      Serial.print ("\t");
-      Serial.print (lastbit);
-      Serial.print ("\t");
+      Serial.println("Inverted UART format: ");
+      Serial.print (UARThigh, BIN);
+      Serial.print (".");
       Serial.println (UARTlow, BIN);
     #endif
-  }
-  Serial.println ("-----");
-  while (UARThigh) {
-    if ((UARThigh & B1) != lastbit) {
-      outputcode[codeLen] = numbits;
-      codeLen++;
-      numbits = 0;
-      if (lastbit) {
-        lastbit = 0;
-      } else {
-        lastbit = 1;
-      }
-    } else {
-      numbits++;
-      UARThigh = UARThigh >> 1;
-    }    
-
-    #ifdef debug
-      Serial.print (numbits);
-      Serial.print ("\t");
-      Serial.print (lastbit);
-      Serial.print ("\t");
-      Serial.println (UARThigh, BIN);
-    #endif
-  }
   
-  #ifdef debug
-    Serial.println("Counted array: ");
-    for (int i = 0; i < codeLen; i++) {
-      Serial.print(outputcode[i]);
+    // count bits to generate timing code
+    byte numbits = 0;
+    byte lastbit = 0;
+  
+    #ifdef debug
+      Serial.println("Parsing output code: ");
+      Serial.println("Count\tSearch\tData: ");
+    #endif
+    while (UARTlow) {
+      if ((UARTlow & B1) != lastbit) {
+        outputcode[codeLen] = numbits;
+        codeLen++;
+        numbits = 0;
+        if (lastbit) {
+          lastbit = 0;
+        } else {
+          lastbit = 1;
+        }
+      } else {
+        numbits++;
+        UARTlow = UARTlow >> 1;
+      }    
+  
+      #ifdef debug
+        Serial.print (numbits);
+        Serial.print ("\t");
+        Serial.print (lastbit);
+        Serial.print ("\t");
+        Serial.println (UARTlow, BIN);
+      #endif
     }
-    Serial.print(" (");
-    Serial.print(codeLen);
-    Serial.println(")");
-  #endif
-
-  for (int i = 0; i < codeLen; i++) {
-    outputcode[i] = outputcode[i] * framewidth;
-  }
-
-  #ifdef debug
-    Serial.println("Final array: ");
-    for (int i = 0; i < codeLen; i++) {
-      Serial.print(outputcode[i]);
-      Serial.print(" ");
+    Serial.println ("-----");
+    while (UARThigh) {
+      if ((UARThigh & B1) != lastbit) {
+        outputcode[codeLen] = numbits;
+        codeLen++;
+        numbits = 0;
+        if (lastbit) {
+          lastbit = 0;
+        } else {
+          lastbit = 1;
+        }
+      } else {
+        numbits++;
+        UARThigh = UARThigh >> 1;
+      }    
+  
+      #ifdef debug
+        Serial.print (numbits);
+        Serial.print ("\t");
+        Serial.print (lastbit);
+        Serial.print ("\t");
+        Serial.println (UARThigh, BIN);
+      #endif
     }
-    Serial.print(" (");
-    Serial.print(codeLen);
-    Serial.println(")");  
+    
+    #ifdef debug
+      Serial.println("Counted array: ");
+      for (int i = 0; i < codeLen; i++) {
+        Serial.print(outputcode[i]);
+      }
+      Serial.print(" (");
+      Serial.print(codeLen);
+      Serial.println(")");
+    #endif
+  
+    for (int i = 0; i < codeLen; i++) {
+      outputcode[i] = outputcode[i] * framewidth;
+    }
+  
+    #ifdef debug
+      Serial.println("Final array: ");
+      for (int i = 0; i < codeLen; i++) {
+        Serial.print(outputcode[i]);
+        Serial.print(" ");
+      }
+      Serial.print(" (");
+      Serial.print(codeLen);
+      Serial.println(")");  
+    #endif
   #endif
 }

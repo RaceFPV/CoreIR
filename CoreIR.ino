@@ -19,6 +19,9 @@ const long tx_alt_id = 8901234;
 // Enable debug info on serial output
 #define debug
 
+// New softserial output ---- TESTING
+#define softout
+
 //check which arduino board we are using and build accordingly
 #if defined(__AVR_ATtiny84__) || defined(__AVR_ATtiny167__) || defined(__AVR_ATtiny85)
   //if using an attiny build with all defaults, don't define anything
@@ -29,6 +32,11 @@ const long tx_alt_id = 8901234;
 #else
   //if using an atmega328p or similar build with eeprom enabled
   #define atmega
+#endif
+
+#if defined(softout)
+  #include <SoftwareSerial.h>
+  SoftwareSerial mySerial(8, 9);
 #endif
 
 //TODO, set pins for attiny85 boards
@@ -86,6 +94,25 @@ void setup() {
     while (!Serial)
   #endif
 
+  
+  #if defined(softout)
+    #if defined(micro)
+      mySerial.begin(38400);  // Begin software serial interface at 38400.
+      pinMode(5, OUTPUT);     // Set output pin for timer
+      TCCR3A = _BV(WGM31); // Set registers for fast PWM.
+      TCCR3B = _BV(WGM33) | _BV(CS30); // Read the 328p datasheet for more details on fast PWM.
+      OCR3A = 34; // At 16MHz, these values produce roughly 455KHz signal. 16M / 35 = 457K.
+      OCR3B = 17; // This should be half of above value. This can be adjusted slightly for taste.
+    #else
+      mySerial.begin(38400);  // Begin software serial interface at 38400.
+      pinMode(3, OUTPUT);     // Set output pin for OCR2B
+      TCCR2A = _BV(COM2A1) | _BV(COM2B1) | _BV(WGM21) | _BV(WGM20); // Set registers for fast PWM.
+      TCCR2B = _BV(WGM22) | _BV(CS20); // Read the 328p datasheet for more details on fast PWM.
+      OCR2A = 34; // At 16MHz, these values produce roughly 455KHz signal. 16M / 35 = 457K.
+      OCR2B = 17; // This should be half of above value. This can be adjusted slightly for taste.
+    #endif
+  #endif
+
   // Generate timecode
   #ifdef debug
     Serial.print("Building code: ");
@@ -111,9 +138,19 @@ void setup() {
 }
 
 void loop() {
-  //Send the IR signal, then wait the appropriate amount of time before re-sending
-  irsend.sendRaw(outputcode, codeLen, khz);
-  delayMicroseconds(700);
+  #if defined(softout)
+    mySerial.write(bit1); // transmit one byte at a time.
+    mySerial.write(bit2);
+    mySerial.write(bit3);
+    mySerial.write(bit4);
+    mySerial.write(bit5);
+    mySerial.write(bit6);
+    delay(5); // wait 5ms before transmitting again.
+  #else
+    //Send the IR signal, then wait the appropriate amount of time before re-sending
+    irsend.sendRaw(outputcode, codeLen, khz);
+    delayMicroseconds(700);
+  #endif
 
   // -----Status LED blink code start -----
     unsigned long currentMillis = millis();
