@@ -13,7 +13,7 @@
 //CONFIGURABLE SECTION - SET TRANSPONDER ID
 //Change transponder ID # by setting a different transponder number for tx_id
 //WARNING: IDs set by CoreIR-Uplink tool will override these numbers
-const long tx_id = 8888888;
+const long tx_id = 1242428;
 const long tx_alt_id = 8901234;
 
 // Enable debug info on serial output
@@ -27,7 +27,7 @@ const long tx_alt_id = 8901234;
   //if using an attiny build with all defaults, don't define anything
 #elif defined(__AVR_ATmega32U4__)
   //if using an arduino micro build with eeprom enabled and different LED pin
-  //#define atmega
+  #define atmega
   #define micro
 #else
   //if using an atmega328p or similar build with eeprom enabled
@@ -165,7 +165,7 @@ void loop() {
   #else
     //Send the IR signal, then wait the appropriate amount of time before re-sending
     irsend.sendRaw(outputcode, codeLen, khz);
-    delayMicroseconds(700);
+    delayMicroseconds(2000);
   #endif
 
   // -----Status LED blink code start -----
@@ -183,5 +183,5 @@ void loop() {
       digitalWrite(ledPin, ledState);
     // -----LED blink code end -----
   }
-  delayMicroseconds(700);
+  delayMicroseconds(1800);
 }
