@@ -59,6 +59,7 @@ const long tx_alt_id = 8901234;
   #include <EEPROM.h>
   #include "saved.h"
 #endif
+String incomingString = "";   // for incoming serial data
 
 // Include libraries for IR LED frequency, speed and encoding
 #include "IRsnd.h"
@@ -76,7 +77,7 @@ void setup() {
   #ifdef atmega
     // save the new transponder numbers in eeprom if they are not already there
     if (EEPROMReadlong(0) != tx_id) {
-      long tx_id = EEPROMReadlong(0);
+      long tx_id = EEPROMReadlong(64);
     }
     if (EEPROMReadlong(4) != tx_alt_id) {
       long tx_alt_id = EEPROMReadlong(4);
@@ -89,10 +90,10 @@ void setup() {
   pinMode(bridgePinOut, OUTPUT);
   digitalWrite(bridgePinOut, LOW);
   
-  #ifdef debug
     Serial.begin(9600);
-    while (!Serial)
-  #endif
+    #if defined(micro)
+      while (!Serial)
+    #endif
 
   
   #if defined(softout)
@@ -154,6 +155,27 @@ void setup() {
 }
 
 void loop() {
+  //serial data stuff for coreir-uplink support
+  // send data only when you receive data:
+  if (Serial.available() > 0) {
+    // read the incoming byte:
+    incomingString = Serial.readString();
+    //if asked, send back the current ID
+    if (incomingString == "readID") {
+      Serial.println(EEPROMReadlong(64));
+      incomingString = "";
+    }
+    //if asked, set a new ID
+    if (incomingString.length() > 7) {
+      incomingString.remove(0,7);
+      long idtolong = incomingString.toInt();
+      EEPROMWritelong(64, idtolong);
+      delayMicroseconds(3000);
+      long tx_id = EEPROMReadlong(64);
+      Serial.println(tx_id);
+      incomingString = "";
+    }
+  }
   #if defined(softout)
     mySerial.write(bit1); // transmit one byte at a time.
     mySerial.write(bit2);
