@@ -91,7 +91,7 @@ void setup() {
   digitalWrite(bridgePinOut, LOW);
   
     Serial.begin(9600);
-    #if defined(micro)
+    #if defined(micro) & defined(debug)
       while (!Serial)
     #endif
 
