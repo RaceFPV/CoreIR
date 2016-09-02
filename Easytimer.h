@@ -1,17 +1,18 @@
-  #define BIT_SET(a,b) ((a) |= (1<<(b)))
-  #define BIT_CLEAR(a,b) ((a) &= ~(1<<(b)))
-  #define BIT_FLIP(a,b) ((a) ^= (1<<(b)))
-  #define BIT_CHECK(a,b) ((a) & (1<<(b)))
-  #define NUM_BITS  9
-  #define ZERO 250
-  #define ONE 650
-  unsigned int buffer[NUM_BITS];
-  unsigned int num_one_pulses = 0;
-  unsigned int get_pulse_width_for_buffer(int bit){
+//Credit to airbirds.de and polyvision UG for coming up with the original easyracelaptimer system!
+
+#define BIT_SET(a,b) ((a) |= (1<<(b)))
+#define BIT_CLEAR(a,b) ((a) &= ~(1<<(b)))
+#define BIT_FLIP(a,b) ((a) ^= (1<<(b)))
+#define BIT_CHECK(a,b) ((a) & (1<<(b)))
+#define NUM_BITS  9
+#define ZERO 250
+#define ONE 650
+unsigned int buffer[NUM_BITS];
+unsigned int num_one_pulses = 0;
+unsigned int get_pulse_width_for_buffer(int bit){
   if(BIT_CHECK(easylap_id,bit)){
     return ONE;
   }
-
   return ZERO;
 }
 
