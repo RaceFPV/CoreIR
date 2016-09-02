@@ -22,6 +22,9 @@ const long tx_alt_id = 8901234;
 // New softserial output ---- TESTING
 //#define softout
 
+// EasyRaceLapTimer support ---- TESTING
+#define easytimer
+
 //check which arduino board we are using and build accordingly
 #if defined(__AVR_ATtiny84__) || defined(__AVR_ATtiny167__) || defined(__AVR_ATtiny85)
   //if using an attiny build with all defaults, don't define anything
@@ -37,6 +40,10 @@ const long tx_alt_id = 8901234;
 #if defined(softout)
   #include <SoftwareSerial.h>
   SoftwareSerial mySerial(8, 9);
+#endif
+
+#if defined(easytimer)
+  #include "Easytimer.h"
 #endif
 
 //TODO, set pins for attiny85 boards
@@ -118,6 +125,9 @@ void setup() {
   #ifdef debug
     Serial.print("Building code from: ");
   #endif
+  #if defined(easytimer)
+    geteasylapcode();
+  #else
   if (digitalRead(bridgePinIn)) {
     #ifdef debug
       Serial.println("Main ID:");
@@ -133,6 +143,7 @@ void setup() {
     interval = 1000; // Blink LED slower for alt id
     makeOutputCode(tx_alt_id); // use standard ID otherwise
   }
+  #endif
   
   #if defined(debug) && defined(softout)
     Serial.println("Sending: ");
@@ -184,6 +195,8 @@ void loop() {
     mySerial.write(bit5);
     mySerial.write(bit6);
     delay(5); // wait 5ms before transmitting again.
+  #elif defined(easytimer)
+    irsend.sendRaw(buffer,NUM_BITS,38);
   #else
     //Send the IR signal, then wait the appropriate amount of time before re-sending
     irsend.sendRaw(outputcode, codeLen, khz);
