@@ -2,14 +2,13 @@
   #define BIT_CLEAR(a,b) ((a) &= ~(1<<(b)))
   #define BIT_FLIP(a,b) ((a) ^= (1<<(b)))
   #define BIT_CHECK(a,b) ((a) & (1<<(b)))
-  #define TRANSPONDER_ID 2
   #define NUM_BITS  9
   #define ZERO 250
   #define ONE 650
   unsigned int buffer[NUM_BITS];
   unsigned int num_one_pulses = 0;
   unsigned int get_pulse_width_for_buffer(int bit){
-  if(BIT_CHECK(TRANSPONDER_ID,bit)){
+  if(BIT_CHECK(easylap_id,bit)){
     return ONE;
   }
 
@@ -40,7 +39,7 @@ void geteasylapcode() {
     for(int i= 0; i < NUM_BITS; i++){
       Serial.println(buffer[i],DEC);
     }
-    Serial.println(TRANSPONDER_ID,BIN);
+    Serial.println(easylap_id,BIN);
   #endif
 }
 
