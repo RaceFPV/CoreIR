@@ -13,7 +13,7 @@
 //CONFIGURABLE SECTION - SET TRANSPONDER ID
 //Change transponder ID # by setting a different transponder number for tx_id
 //WARNING: IDs set by CoreIR-Uplink tool will override these numbers
-const long tx_id = 1242428;
+const long tx_id = 8581287;
 const long tx_alt_id = 8901234;
 const int easylap_id = 2;
 
@@ -226,8 +226,6 @@ void loop() {
     mySerial.write(bit5);
     mySerial.write(bit6);
     delay(5); // wait 5ms before transmitting again.
-  #elif defined(easytimer)
-    irsend.sendRaw(buffer,NUM_BITS,38);
   #else
     if (easylap_on == 1){
       irsend.sendRaw(buffer,NUM_BITS,38);
