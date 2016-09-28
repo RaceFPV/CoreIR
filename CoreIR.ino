@@ -32,15 +32,17 @@ const int easylap_id = 2;
 #endif
 
 //check which arduino board we are using and build accordingly
-#if defined(__AVR_ATtiny84__) || defined(__AVR_ATtiny167__) || defined(__AVR_ATtiny85)
+#if defined(__AVR_ATtiny84__) || defined(__AVR_ATtiny167__) || defined(__AVR_ATtiny85__)
   //if using an attiny build with all defaults, don't define anything
 #elif defined(__AVR_ATmega32U4__)
   //if using an arduino micro build with eeprom enabled and different LED pin
   #define atmega
   #define micro
-#else
+#elif defined(__AVR_ATmega328p__) || defined(__AVR_ATmega64__) || defined(__AVR_ATmega128__) || defined(__AVR_ATmega328__) || defined(__AVR_ATmega168__)
   //if using an atmega328p or similar build with eeprom enabled
   #define atmega
+#else
+  //define nothing
 #endif
 
 #if defined(softout)
@@ -102,11 +104,13 @@ void setup() {
   digitalWrite(bridgePinIn, HIGH);
   pinMode(bridgePinOut, OUTPUT);
   digitalWrite(bridgePinOut, LOW);
-  
+
+  #ifdef atmega
     Serial.begin(9600);
     #if defined(micro) & defined(debug)
       while (!Serial)
     #endif
+  #endif
 
   
   #if defined(softout)
@@ -173,6 +177,7 @@ void setup() {
 }
 
 void loop() {
+  #ifdef atmega
   //serial data stuff for coreir-uplink support
   // send data only when you receive data:
   if (easylap_on == 1) {
@@ -217,6 +222,7 @@ void loop() {
         }
       }
     }
+    #endif
   
   #if defined(softout)
     mySerial.write(bit1); // transmit one byte at a time.
