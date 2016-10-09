@@ -38,7 +38,6 @@ typedef
   struct {
     // The fields are ordered to reduce memory over caused by struct-padding
     uint8_t       rcvstate;        // State Machine state
-    uint8_t       recvpin;         // Pin connected to IR data from detector
     uint8_t       blinkpin;
     uint8_t       blinkflag;       // true -> enable blinking of pin on IR processing
     uint8_t       rawlen;          // counter of entries in rawbuf
@@ -106,37 +105,6 @@ EXTERN  volatile irparams_t  irparams;
 #endif
 
 //------------------------------------------------------------------------------
-// Pulse parms are ((X*50)-100) for the Mark and ((X*50)+100) for the Space.
-// First MARK is the one after the long gap
-// Pulse parameters in uSec
-//
-
-// Due to sensor lag, when received, Marks  tend to be 100us too long and
-//                                   Spaces tend to be 100us too short
-#define MARK_EXCESS    100
-
-// microseconds per clock interrupt tick
-#define USECPERTICK    50
-
-// Upper and Lower percentage tolerances in measurements
-#define TOLERANCE       25
-#define LTOL            (1.0 - (TOLERANCE/100.))
-#define UTOL            (1.0 + (TOLERANCE/100.))
-
-// Minimum gap between IR transmissions
-#define _GAP            5000
-#define GAP_TICKS       (_GAP/USECPERTICK)
-
-#define TICKS_LOW(us)   ((int)(((us)*LTOL/USECPERTICK)))
-#define TICKS_HIGH(us)  ((int)(((us)*UTOL/USECPERTICK + 1)))
-
-//------------------------------------------------------------------------------
-// IR detector output is active low
-//
-#define MARK   0
-#define SPACE  1
-
-//------------------------------------------------------------------------------
 // Define which timer to use
 //
 // Uncomment the timer you wish to use on your board.
@@ -144,43 +112,10 @@ EXTERN  volatile irparams_t  irparams;
 //   switch IRremote to use a different timer.
 //
 
-// Arduino Mega
-#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-  //#define IR_USE_TIMER1   // tx = pin 11
-  #define IR_USE_TIMER2     // tx = pin 9
-  //#define IR_USE_TIMER3   // tx = pin 5
-  //#define IR_USE_TIMER4   // tx = pin 6
-  //#define IR_USE_TIMER5   // tx = pin 46
-
-// Teensy 1.0
-#elif defined(__AVR_AT90USB162__)
-  #define IR_USE_TIMER1     // tx = pin 17
-
 // Teensy 2.0
-#elif defined(__AVR_ATmega32U4__)
+#if defined(__AVR_ATmega32U4__)
   //#define IR_USE_TIMER1   // tx = pin 14
   #define IR_USE_TIMER3   // tx = pin 9
-  //#define IR_USE_TIMER4_HS  // tx = pin 10
-
-// Teensy 3.0 / Teensy 3.1
-#elif defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
-  #define IR_USE_TIMER_CMT  // tx = pin 5
-
-// Teensy-LC
-#elif defined(__MKL26Z64__)
-  #define IR_USE_TIMER_TPM1 // tx = pin 16
-
-// Teensy++ 1.0 & 2.0
-#elif defined(__AVR_AT90USB646__) || defined(__AVR_AT90USB1286__)
-  //#define IR_USE_TIMER1   // tx = pin 25
-  #define IR_USE_TIMER2     // tx = pin 1
-  //#define IR_USE_TIMER3   // tx = pin 16
-
-// MightyCore - ATmega1284
-#elif defined(__AVR_ATmega1284__) || defined(__AVR_ATmega1284P__)
-  //#define IR_USE_TIMER1   // tx = pin 13
-  #define IR_USE_TIMER2     // tx = pin 14
-  //#define IR_USE_TIMER3   // tx = pin 6
 
 // MightyCore - ATmega164, ATmega324, ATmega644
 #elif defined(__AVR_ATmega644__) || defined(__AVR_ATmega644P__) \
@@ -372,52 +307,6 @@ EXTERN  volatile irparams_t  irparams;
 #else
 # define TIMER_PWM_PIN 5
 #endif
-
-//---------------------------------------------------------
-// Timer4 (10 bits, high speed option)
-//
-#elif defined(IR_USE_TIMER4_HS)
-
-#define TIMER_RESET
-#define TIMER_ENABLE_PWM    (TCCR4A |= _BV(COM4A1))
-#define TIMER_DISABLE_PWM   (TCCR4A &= ~(_BV(COM4A1)))
-#define TIMER_ENABLE_INTR   (TIMSK4 = _BV(TOIE4))
-#define TIMER_DISABLE_INTR  (TIMSK4 = 0)
-#define TIMER_INTR_NAME     TIMER4_OVF_vect
-
-#define TIMER_CONFIG_KHZ(val) ({ \
-  const uint16_t pwmval = SYSCLOCK / 2000 / (val); \
-  TCCR4A                = (1<<PWM4A); \
-  TCCR4B                = _BV(CS40); \
-  TCCR4C                = 0; \
-  TCCR4D                = (1<<WGM40); \
-  TCCR4E                = 0; \
-  TC4H                  = pwmval >> 8; \
-  OCR4C                 = pwmval; \
-  TC4H                  = (pwmval / 3) >> 8; \
-  OCR4A                 = (pwmval / 3) & 255; \
-})
-
-#define TIMER_CONFIG_NORMAL() ({ \
-  TCCR4A = 0; \
-  TCCR4B = _BV(CS40); \
-  TCCR4C = 0; \
-  TCCR4D = 0; \
-  TCCR4E = 0; \
-  TC4H   = (SYSCLOCK * USECPERTICK / 1000000) >> 8; \
-  OCR4C  = (SYSCLOCK * USECPERTICK / 1000000) & 255; \
-  TC4H   = 0; \
-  TCNT4  = 0; \
-})
-
-//-----------------
-//#if defined(CORE_OC4A_PIN)
-//# define TIMER_PWM_PIN  CORE_OC4A_PIN  // Teensy
-//#elif defined(__AVR_ATmega32U4__)
-#define TIMER_PWM_PIN  10             // Leonardo
-//#else
-//# error "Please add OC4A pin number here\n"
-//#endif
 
 //---------------------------------------------------------
 // Timer4 (16 bits)

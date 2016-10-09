@@ -143,14 +143,6 @@ void makeOutputCode(unsigned long tcode) {
     Serial.print(" ");
     Serial.println(fullcode[5], HEX);
   #endif
-  #if defined(softout)
-    bit1 = fullcode[0];
-    bit2 = fullcode[1];
-    bit3 = fullcode[2];
-    bit4 = fullcode[3];
-    bit5 = fullcode[4];
-    bit6 = fullcode[5];
-  #else
     // make reversed UART string
     uint32_t UARThigh = 0;
     uint32_t UARTlow = 0;
@@ -256,5 +248,4 @@ void makeOutputCode(unsigned long tcode) {
       Serial.print(codeLen);
       Serial.println(")");  
     #endif
-  #endif
 }

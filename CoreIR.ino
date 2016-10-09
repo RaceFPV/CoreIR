@@ -20,9 +20,6 @@ const int easylap_id = 2;
 // Enable debug info on serial output
 //#define debug
 
-// New softserial output ---- TESTING
-//#define softout
-
 // EasyRaceLapTimer support ---- TESTING
   #define easytimer
 
@@ -43,11 +40,6 @@ const int easylap_id = 2;
   #define atmega
 #else
   //define nothing
-#endif
-
-#if defined(softout)
-  #include <SoftwareSerial.h>
-  SoftwareSerial mySerial(8, 9);
 #endif
 
 #if defined(easytimer)
@@ -112,25 +104,6 @@ void setup() {
     #endif
   #endif
 
-  
-  #if defined(softout)
-    #if defined(micro)
-      mySerial.begin(38400);  // Begin software serial interface at 38400.
-      pinMode(5, OUTPUT);     // Set output pin for timer
-      TCCR3A = _BV(WGM31); // Set registers for fast PWM.
-      TCCR3B = _BV(WGM33) | _BV(CS30); // Read the 328p datasheet for more details on fast PWM.
-      OCR3A = 34; // At 16MHz, these values produce roughly 455KHz signal. 16M / 35 = 457K.
-      OCR3B = 17; // This should be half of above value. This can be adjusted slightly for taste.
-    #else
-      mySerial.begin(38400);  // Begin software serial interface at 38400.
-      pinMode(3, OUTPUT);     // Set output pin for OCR2B
-      TCCR2A = _BV(COM2A1) | _BV(COM2B1) | _BV(WGM21) | _BV(WGM20); // Set registers for fast PWM.
-      TCCR2B = _BV(WGM22) | _BV(CS20); // Read the 328p datasheet for more details on fast PWM.
-      OCR2A = 34; // At 16MHz, these values produce roughly 455KHz signal. 16M / 35 = 457K.
-      OCR2B = 17; // This should be half of above value. This can be adjusted slightly for taste.
-    #endif
-  #endif
-
   // Generate timecode
   #ifdef debug
     Serial.print("Building code from: ");
@@ -155,22 +128,6 @@ void setup() {
       makeOutputCode(tx_alt_id); // use standard ID otherwise
     }
   }
-  
-  #if defined(debug) && defined(softout)
-    Serial.println("Sending: ");
-    Serial.print("0"); // fix an issue where leading 0 in hex does not appear in serial.print
-    Serial.print(bit1, HEX);
-    Serial.print(" ");
-    Serial.print(bit2, HEX);
-    Serial.print(" ");
-    Serial.print(bit3, HEX);
-    Serial.print(" ");
-    Serial.print(bit4, HEX);
-    Serial.print(" ");
-    Serial.print(bit5, HEX);
-    Serial.print(" ");
-    Serial.println(bit6, HEX);
-  #endif
   
   // Set up for blinking the status LED
   pinMode(ledPin, OUTPUT);
@@ -223,17 +180,9 @@ void loop() {
       }
     }
     #endif
-  
-  #if defined(softout)
-    mySerial.write(bit1); // transmit one byte at a time.
-    mySerial.write(bit2);
-    mySerial.write(bit3);
-    mySerial.write(bit4);
-    mySerial.write(bit5);
-    mySerial.write(bit6);
-    delay(5); // wait 5ms before transmitting again.
-  #else
-    if (easylap_on == 1){
+
+    
+  if (easylap_on == 1){
       irsend.sendRaw(buffer,NUM_BITS,38);
       delay(17 + random(0, 5));
     }
@@ -242,8 +191,7 @@ void loop() {
       irsend.sendRaw(outputcode, codeLen, khz);
       delayMicroseconds(2000);
     }
-  #endif
-
+  
   // -----Status LED blink code start -----
     unsigned long currentMillis = millis();
     if (currentMillis - previousMillis >= interval) {
