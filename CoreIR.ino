@@ -13,7 +13,7 @@
 //CONFIGURABLE SECTION - SET TRANSPONDER ID
 //Change transponder ID # by setting a different transponder number for tx_id
 //WARNING: IDs set by CoreIR-Uplink tool will override these numbers
-const long tx_id = 8217306;
+const long tx_id = 8581287;
 const long tx_alt_id = 8901234;
 const int easylap_id = 2;
 
@@ -24,7 +24,7 @@ const int easylap_id = 2;
 //#define softout
 
 // EasyRaceLapTimer support ---- TESTING
-//  #define easytimer
+  #define easytimer
 
   
 #ifdef easytimer
@@ -135,7 +135,10 @@ void setup() {
   #ifdef debug
     Serial.print("Building code from: ");
   #endif
-
+  if (easylap_on == 1){
+    geteasylapcode();
+  }
+  else {
     if (digitalRead(bridgePinIn)) {
       #ifdef debug
         Serial.println("Main ID:");
@@ -151,6 +154,7 @@ void setup() {
       interval = 1000; // Blink LED slower for alt id
       makeOutputCode(tx_alt_id); // use standard ID otherwise
     }
+  }
   
   #if defined(debug) && defined(softout)
     Serial.println("Sending: ");
@@ -173,9 +177,72 @@ void setup() {
 }
 
 void loop() {
+  #ifdef atmega
+  //serial data stuff for coreir-uplink support
+  // send data only when you receive data:
+  if (easylap_on == 1) {
+    if (Serial.available() > 0) {
+      // read the incoming byte:
+      incomingString = Serial.readString();
+      //if asked, send back the current ID
+      if (incomingString == "readID") {
+        Serial.println(EEPROMReadlong(70));
+        incomingString = "";
+      }
+      else {
+      //if asked, set a new ID
+        incomingString.remove(0,7);
+        long idtolong = incomingString.toInt();
+        EEPROMWritelong(70, idtolong);
+        delayMicroseconds(3000);
+        long easylap_id = EEPROMReadlong(70);
+        Serial.println(easylap_id);
+        incomingString = "";
+        }
+      }
+    }
+    else {
+      if (Serial.available() > 0) {
+      // read the incoming byte:
+      incomingString = Serial.readString();
+      //if asked, send back the current ID
+      if (incomingString == "readID") {
+        Serial.println(EEPROMReadlong(64));
+        incomingString = "";
+      }
+      //if asked, set a new ID
+      if (incomingString.length() > 7) {
+        incomingString.remove(0,7);
+        long idtolong = incomingString.toInt();
+        EEPROMWritelong(64, idtolong);
+        delayMicroseconds(3000);
+        long tx_id = EEPROMReadlong(64);
+        Serial.println(tx_id);
+        incomingString = "";
+        }
+      }
+    }
+    #endif
   
+  #if defined(softout)
+    mySerial.write(bit1); // transmit one byte at a time.
+    mySerial.write(bit2);
+    mySerial.write(bit3);
+    mySerial.write(bit4);
+    mySerial.write(bit5);
+    mySerial.write(bit6);
+    delay(5); // wait 5ms before transmitting again.
+  #else
+    if (easylap_on == 1){
+      irsend.sendRaw(buffer,NUM_BITS,38);
+      delay(17 + random(0, 5));
+    }
+    else {
       //Send the IR signal, then wait the appropriate amount of time before re-sending
       irsend.sendRaw(outputcode, codeLen, khz);
+      delayMicroseconds(2000);
+    }
+  #endif
 
   // -----Status LED blink code start -----
     unsigned long currentMillis = millis();
