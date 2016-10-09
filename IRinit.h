@@ -105,14 +105,6 @@ EXTERN  volatile irparams_t  irparams;
   //#define IR_USE_TIMER1   // tx = pin 14
   #define IR_USE_TIMER3   // tx = pin 9
 
-// MightyCore - ATmega164, ATmega324, ATmega644
-#elif defined(__AVR_ATmega644__) || defined(__AVR_ATmega644P__) \
-|| defined(__AVR_ATmega324P__) || defined(__AVR_ATmega324A__) \
-|| defined(__AVR_ATmega324PA__) || defined(__AVR_ATmega164A__) \
-|| defined(__AVR_ATmega164P__)
-  //#define IR_USE_TIMER1   // tx = pin 13
-  #define IR_USE_TIMER2     // tx = pin 14
-  
 //MegaCore - ATmega64, ATmega128
 #elif defined(__AVR_ATmega64__) || defined(__AVR_ATmega128__)
   #define IR_USE_TIMER1     // tx = pin 13
