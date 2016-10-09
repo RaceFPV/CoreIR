@@ -64,55 +64,43 @@ EXTERN  volatile irparams_t  irparams;
 //
 
 #if defined(CORE_LED0_PIN)
-# define BLINKLED        CORE_LED0_PIN
-# define BLINKLED_ON()   (digitalWrite(CORE_LED0_PIN, HIGH))
-# define BLINKLED_OFF()  (digitalWrite(CORE_LED0_PIN, LOW))
-
-#elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-# define BLINKLED        13
-# define BLINKLED_ON()   (PORTB |= B10000000)
-# define BLINKLED_OFF()  (PORTB &= B01111111)
-
-#elif defined(__AVR_ATmega644P__) || defined(__AVR_ATmega644__)
-# define BLINKLED        0
-# define BLINKLED_ON()   (PORTD |= B00000001)
-# define BLINKLED_OFF()  (PORTD &= B11111110)
-
+  # define BLINKLED        CORE_LED0_PIN
+  # define BLINKLED_ON()   (digitalWrite(CORE_LED0_PIN, HIGH))
+  # define BLINKLED_OFF()  (digitalWrite(CORE_LED0_PIN, LOW))
 #else
-# define BLINKLED        13
-  #define BLINKLED_ON()  (PORTB |= B00100000)
-# define BLINKLED_OFF()  (PORTB &= B11011111)
+  # define BLINKLED        13
+  # define BLINKLED_ON()  (PORTB |= B00100000)
+  # define BLINKLED_OFF()  (PORTB &= B11011111)
 #endif
 
 //------------------------------------------------------------------------------
 // CPU Frequency
 //
+// microseconds per clock interrupt tick
+# define USECPERTICK 50
+
 #ifdef F_CPU
-# define SYSCLOCK  F_CPU     // main Arduino clock
+  # define SYSCLOCK  F_CPU     // main Arduino clock
 #else
-# define SYSCLOCK  16000000  // main Arduino clock
+  # define SYSCLOCK  16000000  // main Arduino clock
 #endif
 
 //------------------------------------------------------------------------------
 // Defines for setting and clearing register bits
 //
 #ifndef cbi
-# define cbi(sfr, bit)  (_SFR_BYTE(sfr) &= ~_BV(bit))
+  # define cbi(sfr, bit)  (_SFR_BYTE(sfr) &= ~_BV(bit))
 #endif
 
 #ifndef sbi
-# define sbi(sfr, bit)  (_SFR_BYTE(sfr) |= _BV(bit))
+  # define sbi(sfr, bit)  (_SFR_BYTE(sfr) |= _BV(bit))
 #endif
 
 //------------------------------------------------------------------------------
 // Define which timer to use
 //
-// Uncomment the timer you wish to use on your board.
-// If you are using another library which uses timer2, you have options to
-//   switch IRremote to use a different timer.
-//
 
-// Teensy 2.0
+// Micro and Pro micro - ATmega32U4
 #if defined(__AVR_ATmega32U4__)
   //#define IR_USE_TIMER1   // tx = pin 14
   #define IR_USE_TIMER3   // tx = pin 9
@@ -148,8 +136,8 @@ EXTERN  volatile irparams_t  irparams;
 // Arduino Duemilanove, Diecimila, LilyPad, Mini, Fio, Nano, etc
 // ATmega48, ATmega88, ATmega168, ATmega328
 #else
-  #define IR_USE_TIMER1   // tx = pin 9
-  //#define IR_USE_TIMER2     // tx = pin 3
+  //#define IR_USE_TIMER1   // tx = pin 9
+  #define IR_USE_TIMER2     // tx = pin 3
 
 #endif
 
@@ -196,11 +184,7 @@ EXTERN  volatile irparams_t  irparams;
 #endif
 
 //-----------------
-#if defined(CORE_OC2B_PIN)
-# define TIMER_PWM_PIN  CORE_OC2B_PIN  // Teensy
-#elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-# define TIMER_PWM_PIN  9              // Arduino Mega
-#elif defined(__AVR_ATmega1284__) || defined(__AVR_ATmega1284P__) \
+#if defined(__AVR_ATmega1284__) || defined(__AVR_ATmega1284P__) \
 || defined(__AVR_ATmega644__) || defined(__AVR_ATmega644P__) \
 || defined(__AVR_ATmega324P__) || defined(__AVR_ATmega324A__) \
 || defined(__AVR_ATmega324PA__) || defined(__AVR_ATmega164A__) \
@@ -249,11 +233,7 @@ EXTERN  volatile irparams_t  irparams;
 })
 
 //-----------------
-#if defined(CORE_OC1A_PIN)
-# define TIMER_PWM_PIN  CORE_OC1A_PIN  // Teensy
-#elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-# define TIMER_PWM_PIN  11             // Arduino Mega
-#elif defined(__AVR_ATmega64__) || defined(__AVR_ATmega128__)
+#if defined(__AVR_ATmega64__) || defined(__AVR_ATmega128__)
 # define TIMER_PWM_PIN  13       // MegaCore
 #elif defined(__AVR_ATmega1284__) || defined(__AVR_ATmega1284P__) \
 || defined(__AVR_ATmega644__) || defined(__AVR_ATmega644P__) \
@@ -278,8 +258,6 @@ EXTERN  volatile irparams_t  irparams;
 #define TIMER_RESET
 #define TIMER_ENABLE_PWM     (TCCR3A |= _BV(COM3A1))
 #define TIMER_DISABLE_PWM    (TCCR3A &= ~(_BV(COM3A1)))
-#define TIMER_ENABLE_INTR    (TIMSK3 = _BV(OCIE3A))
-#define TIMER_DISABLE_INTR   (TIMSK3 = 0)
 #define TIMER_INTR_NAME      TIMER3_COMPA_vect
 
 #define TIMER_CONFIG_KHZ(val) ({ \
@@ -290,95 +268,8 @@ EXTERN  volatile irparams_t  irparams;
   OCR3A = pwmval / 3; \
 })
 
-#define TIMER_CONFIG_NORMAL() ({ \
-  TCCR3A = 0; \
-  TCCR3B = _BV(WGM32) | _BV(CS30); \
-  OCR3A = SYSCLOCK * USECPERTICK / 1000000; \
-  TCNT3 = 0; \
-})
-
-//-----------------
-#if defined(CORE_OC3A_PIN)
-# define TIMER_PWM_PIN  CORE_OC3A_PIN  // Teensy
-#elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-# define TIMER_PWM_PIN  5              // Arduino Mega
-#elif defined(__AVR_ATmega1284__) || defined(__AVR_ATmega1284P__)
-# define TIMER_PWM_PIN  5              // MightyCore
-#else
 # define TIMER_PWM_PIN 5
-#endif
 
-//---------------------------------------------------------
-// Timer4 (16 bits)
-//
-#elif defined(IR_USE_TIMER4)
-
-#define TIMER_RESET
-#define TIMER_ENABLE_PWM    (TCCR4A |= _BV(COM4A1))
-#define TIMER_DISABLE_PWM   (TCCR4A &= ~(_BV(COM4A1)))
-#define TIMER_ENABLE_INTR   (TIMSK4 = _BV(OCIE4A))
-#define TIMER_DISABLE_INTR  (TIMSK4 = 0)
-#define TIMER_INTR_NAME     TIMER4_COMPA_vect
-
-#define TIMER_CONFIG_KHZ(val) ({ \
-  const uint16_t pwmval = SYSCLOCK / 2000 / (val); \
-  TCCR4A = _BV(WGM41); \
-  TCCR4B = _BV(WGM40) | _BV(CS40); \
-  ICR4 = pwmval; \
-  OCR4A = pwmval / 3; \
-})
-
-#define TIMER_CONFIG_NORMAL() ({ \
-  TCCR4A = 0; \
-  TCCR4B = _BV(WGM42) | _BV(CS40); \
-  OCR4A = SYSCLOCK * USECPERTICK / 1000000; \
-  TCNT4 = 0; \
-})
-
-//-----------------
-#if defined(CORE_OC4A_PIN)
-# define TIMER_PWM_PIN  CORE_OC4A_PIN
-#elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-# define TIMER_PWM_PIN  6  // Arduino Mega
-#else
-#define TIMER_PWM_PIN 10
-#endif
-
-//---------------------------------------------------------
-// Timer5 (16 bits)
-//
-#elif defined(IR_USE_TIMER5)
-
-#define TIMER_RESET
-#define TIMER_ENABLE_PWM    (TCCR5A |= _BV(COM5A1))
-#define TIMER_DISABLE_PWM   (TCCR5A &= ~(_BV(COM5A1)))
-#define TIMER_ENABLE_INTR   (TIMSK5 = _BV(OCIE5A))
-#define TIMER_DISABLE_INTR  (TIMSK5 = 0)
-#define TIMER_INTR_NAME     TIMER5_COMPA_vect
-
-#define TIMER_CONFIG_KHZ(val) ({ \
-  const uint16_t pwmval = SYSCLOCK / 2000 / (val); \
-  TCCR5A = _BV(WGM51); \
-  TCCR5B = _BV(WGM53) | _BV(CS50); \
-  ICR5 = pwmval; \
-  OCR5A = pwmval / 3; \
-})
-
-#define TIMER_CONFIG_NORMAL() ({ \
-  TCCR5A = 0; \
-  TCCR5B = _BV(WGM52) | _BV(CS50); \
-  OCR5A = SYSCLOCK * USECPERTICK / 1000000; \
-  TCNT5 = 0; \
-})
-
-//-----------------
-#if defined(CORE_OC5A_PIN)
-# define TIMER_PWM_PIN  CORE_OC5A_PIN
-#elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-# define TIMER_PWM_PIN  46  // Arduino Mega
-#else
-# error "Please add OC5A pin number here\n"
-#endif
 
 //---------------------------------------------------------
 // Special carrier modulator timer
