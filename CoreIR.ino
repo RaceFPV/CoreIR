@@ -189,7 +189,7 @@ void loop() {
     else {
       //Send the IR signal, then wait the appropriate amount of time before re-sending
       irsend.sendRaw(outputcode, codeLen, khz);
-      delayMicroseconds(2000);
+      delay(7 + random(2, 5));
     }
   
   // -----Status LED blink code start -----
@@ -207,5 +207,5 @@ void loop() {
       digitalWrite(ledPin, ledState);
     // -----LED blink code end -----
   }
-  delayMicroseconds(1800);
+  delayMicroseconds(500);
 }

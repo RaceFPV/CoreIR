@@ -1,5 +1,5 @@
 //init some variables, set the freq based on which clock we end up using (based on the chipset)
-int khz = 370;
+int khz = 426;
 #define framewidth 24 // pulses per data bit
 
 unsigned int outputcode[60];
