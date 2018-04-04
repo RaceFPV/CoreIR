@@ -1,4 +1,4 @@
-.**What is this?**
+**What is this?**
 
 CoreIR is an ultra low cost IR timing gate transponder compatible with i-lap rc timing gates. Usually this type of timing system is used for RC car or drone racing to track how fast you can run laps around a track. Using cheap and easy to find hardware, we've seen builds as cheap as $3 per transponder!
 
