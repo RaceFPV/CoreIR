@@ -21,12 +21,7 @@ const int easylap_id = 2;
 //#define debug
 
 // EasyRaceLapTimer support ---- TESTING
-  #define easytimer
-
-  
-#ifdef easytimer
-  const int easylap_on = 0;
-#endif
+//  #define easytimer
 
 //check which arduino board we are using and build accordingly
 #if defined(__AVR_ATtiny84__) || defined(__AVR_ATtiny167__) || defined(__AVR_ATtiny85__)
@@ -42,7 +37,7 @@ const int easylap_id = 2;
   //define nothing
 #endif
 
-#if defined(easytimer)
+#ifdef easytimer
   #include "Easytimer.h"
 #endif
 
@@ -108,10 +103,9 @@ void setup() {
   #ifdef debug
     Serial.print("Building code from: ");
   #endif
-  if (easylap_on == 1){
+  #if defined(easytimer)
     geteasylapcode();
-  }
-  else {
+  #else 
     if (digitalRead(bridgePinIn)) {
       #ifdef debug
         Serial.println("Main ID:");
@@ -127,7 +121,7 @@ void setup() {
       interval = 1000; // Blink LED slower for alt id
       makeOutputCode(tx_alt_id); // use standard ID otherwise
     }
-  }
+  #endif
   
   // Set up for blinking the status LED
   pinMode(ledPin, OUTPUT);
@@ -137,7 +131,7 @@ void loop() {
   #ifdef atmega
   //serial data stuff for coreir-uplink support
   // send data only when you receive data:
-  if (easylap_on == 1) {
+  #ifdef easytimer
     if (Serial.available() > 0) {
       // read the incoming byte:
       incomingString = Serial.readString();
@@ -157,8 +151,7 @@ void loop() {
         incomingString = "";
         }
       }
-    }
-    else {
+    #else
       if (Serial.available() > 0) {
       // read the incoming byte:
       incomingString = Serial.readString();
@@ -178,19 +171,18 @@ void loop() {
         incomingString = "";
         }
       }
-    }
+    #endif
     #endif
 
     
-  if (easylap_on == 1){
+  #ifdef easytimer
       irsend.sendRaw(buffer,NUM_BITS,38);
       delay(17 + random(0, 5));
-    }
-    else {
+   #else
       //Send the IR signal, then wait the appropriate amount of time before re-sending
       irsend.sendRaw(outputcode, codeLen, khz);
       delay(7 + random(2, 5));
-    }
+    #endif
   
   // -----Status LED blink code start -----
     unsigned long currentMillis = millis();
